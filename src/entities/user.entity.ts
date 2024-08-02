@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { UserProfile } from './userProfile.entity';
 
 @Entity()
 export class User {
@@ -13,4 +14,9 @@ export class User {
 
   @Column()
   password: string;
+
+  @OneToOne(() => UserProfile, (userProfile) => userProfile.user, {
+    cascade: true,
+  })
+  userProfile: UserProfile;
 }

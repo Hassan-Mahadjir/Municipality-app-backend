@@ -4,9 +4,10 @@ import { APP_PIPE } from '@nestjs/core';
 import { UserService } from './user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
+import { UserProfile } from 'src/entities/userProfile.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User, UserProfile])],
   controllers: [UserController],
   providers: [
     {

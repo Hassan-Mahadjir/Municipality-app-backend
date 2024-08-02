@@ -1,5 +1,12 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { UserProfile } from './userProfile.entity';
+import { Complaint } from './complaint.entity';
 
 @Entity()
 export class User {
@@ -15,8 +22,13 @@ export class User {
   @Column()
   password: string;
 
+  //   relationship with Profile table
   @OneToOne(() => UserProfile, (userProfile) => userProfile.user, {
     cascade: true,
   })
   userProfile: UserProfile;
+
+  //   relationship with complaint table
+  @OneToMany(() => Complaint, (complaint) => complaint.user)
+  complaints: Complaint[];
 }

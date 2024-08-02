@@ -12,33 +12,39 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/createUser.dto';
 import { IdParamDto } from './dto/idParam.dto';
+import { ParseIdPipe } from './pipes/paraseIdPipe';
+import { UserService } from './user.service';
+import { UpdateUserDto } from './dto/updateUser.dto';
 
 @Controller('user')
 export class UserController {
+  constructor(private userService: UserService) {}
   @Get()
   findAllUsers() {
-    return 'All Users';
+    return this.userService.findAllUsers();
   }
 
   @Get(':id')
-  findUser(@Param('id', ParseIntPipe) id) {
-    console.log(id);
-    return id;
+  findUser(@Param('id', ParseIntPipe) userId) {
+    return this.userService.findUser(userId);
   }
 
   @Post()
   @UsePipes()
   createUser(@Body() body: CreateUserDto) {
-    return body;
+    return this.userService.createUser(body);
   }
 
   @Patch(':userId')
-  updateUser(@Param() param: IdParamDto, @Body() body: CreateUserDto) {
-    return 'user is updated';
+  updateUser(
+    @Param('userId', ParseIdPipe) userId,
+    @Body() body: UpdateUserDto,
+  ) {
+    return this.userService.updateUser(userId, body);
   }
 
-  @Delete()
-  deleteUser() {
-    return 'user is deleted';
+  @Delete(':userId')
+  deleteUser(@Param('userId', ParseIdPipe) userId) {
+    return this.userService.deleteUser(userId);
   }
 }

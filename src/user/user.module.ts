@@ -1,8 +1,12 @@
 import { Module, ValidationPipe } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { APP_PIPE } from '@nestjs/core';
+import { UserService } from './user.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from 'src/entities/user.entity';
 
 @Module({
+  imports: [TypeOrmModule.forFeature([User])],
   controllers: [UserController],
   providers: [
     {
@@ -17,6 +21,7 @@ import { APP_PIPE } from '@nestjs/core';
         },
       }),
     },
+    UserService,
   ],
 })
 export class UserModule {}

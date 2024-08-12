@@ -5,10 +5,10 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from './user.entity';
+import { Staff } from './staff.entity';
 
-@Entity()
-export class UserProfile {
+@Entity({ name: 'PROFILE' })
+export class Profile {
   @PrimaryGeneratedColumn()
   profileId: number;
 
@@ -22,9 +22,18 @@ export class UserProfile {
   phone: string;
 
   @Column()
+  avatar: string;
+
+  @Column()
+  gender: string;
+
+  @Column()
+  dateofBirth: Date;
+
+  @Column()
   address: string;
 
-  @OneToOne(() => User, (user) => user.userProfile)
+  @OneToOne(() => Staff, (user) => user.profile)
   @JoinColumn()
-  user: User;
+  staff: Staff;
 }

@@ -8,7 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { StaffService } from './staff.service';
-import { ParseIdPipe } from 'src/user/pipes/paraseIdPipe';
+import { ParseIdPipe } from 'src/staff/pipes/paraseIdPipe';
 import { CreateStaffDto } from './dto/createStaff.dto';
 import { UpdateStaffDto } from './dto/updateStaff.dto';
 
@@ -16,25 +16,27 @@ import { UpdateStaffDto } from './dto/updateStaff.dto';
 export class StaffController {
   constructor(private staffSrevice: StaffService) {}
   @Get()
-  findAllStaff() {}
+  findAllStaff() {
+    return this.staffSrevice.findAllStaff();
+  }
 
   @Get(':id')
   findStaff(@Param('id', ParseIdPipe) staffId) {
-    return staffId;
+    return this.staffSrevice.findStaff(staffId);
   }
 
   @Post()
   createStaff(@Body() body: CreateStaffDto) {
-    return;
+    return this.staffSrevice.createStaff(body);
   }
 
   @Patch(':id')
   updateStaff(@Param('id', ParseIdPipe) staffId, @Body() body: UpdateStaffDto) {
-    return;
+    return this.staffSrevice.updateStaff(staffId, body);
   }
 
   @Delete(':id')
   deleteStaff(@Param('id', ParseIdPipe) staffId) {
-    return;
+    return this.staffSrevice.deleteStaff(staffId);
   }
 }

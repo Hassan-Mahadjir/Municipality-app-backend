@@ -1,14 +1,13 @@
 import { pgConfig } from '../../dbConfig';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { runSeeders, SeederOptions } from 'typeorm-extension';
-import { UserFactroy } from '../seeding/user.factory';
-import { ComplaintFactroy } from '../seeding/complaint.factroy';
-import { MainSeeder } from '../seeding/main.seeder';
-import { UserProfileFactory } from './profile.factory';
+import { StaffFactory } from '../seeding/staff.factory';
+import { ProfileFactory } from '../seeding/profile.factroy';
+import { MainSeeder } from './main.seeder';
 
 const options: DataSourceOptions & SeederOptions = {
   ...pgConfig,
-  factories: [UserFactroy, ComplaintFactroy, UserFactroy, UserProfileFactory],
+  factories: [StaffFactory, ProfileFactory],
   seeds: [MainSeeder],
 };
 

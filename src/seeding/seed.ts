@@ -4,10 +4,11 @@ import { runSeeders, SeederOptions } from 'typeorm-extension';
 import { StaffFactory } from '../seeding/staff.factory';
 import { ProfileFactory } from '../seeding/profile.factroy';
 import { MainSeeder } from './main.seeder';
+import { UserFactory } from './user.factory';
 
 const options: DataSourceOptions & SeederOptions = {
   ...dbConfig(),
-  factories: [StaffFactory, ProfileFactory],
+  factories: [StaffFactory, ProfileFactory, UserFactory],
   seeds: [MainSeeder],
 };
 

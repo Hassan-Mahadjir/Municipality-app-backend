@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Staff } from './staff.entity';
+import { User } from './user.entity';
 
 @Entity({ name: 'PROFILE' })
 export class Profile {
@@ -33,7 +34,13 @@ export class Profile {
   @Column()
   address: string;
 
-  @OneToOne(() => Staff, (user) => user.profile)
+  // staff profile
+  @OneToOne(() => Staff, (staff) => staff.profile)
   @JoinColumn()
   staff: Staff;
+
+  // user profile
+  @OneToOne(() => User, (user) => user.profile)
+  @JoinColumn()
+  user: User;
 }

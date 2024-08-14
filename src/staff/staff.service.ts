@@ -29,8 +29,17 @@ export class StaffService {
     return staff;
   }
 
+  async findByEmail(email: string) {
+    return await this.staffRepo.findOne({
+      where: {
+        email: email,
+      },
+    });
+  }
   async createStaff(body: CreateStaffDto) {
-    return await this.staffRepo.save(body);
+    const staff = this.staffRepo.create(body);
+
+    return await this.staffRepo.save(staff);
   }
 
   async updateStaff(id: number, body: UpdateStaffDto) {

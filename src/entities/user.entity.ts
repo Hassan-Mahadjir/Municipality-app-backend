@@ -6,12 +6,11 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { Profile } from './profile.entity';
 
-import * as bcrypt from 'bcrypt';
-
-@Entity({ name: 'STAFF' })
-export class Staff {
+@Entity({ name: 'USER' })
+export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -24,8 +23,8 @@ export class Staff {
   @CreateDateColumn()
   createAt: Date;
 
-  // Relationship with PROFILE
-  @OneToOne(() => Profile, (profile) => profile.staff)
+  // // Relationship with PROFILE
+  @OneToOne(() => Profile, (profile) => profile.user)
   profile: Profile;
 
   @BeforeInsert()

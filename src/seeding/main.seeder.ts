@@ -34,7 +34,7 @@ export class MainSeeder implements Seeder {
 
     const profileRepo = dataSource.getRepository(Profile);
     await profileRepo.save(staffProfiles);
-
+    console.log('seeding user profiles');
     const userProfiles = await Promise.all(
       users.map(async (user) => {
         const profile = await profileFactory.make({ user: user });

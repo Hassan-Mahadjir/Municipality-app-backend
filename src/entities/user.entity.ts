@@ -26,6 +26,9 @@ export class User {
   @Column({ default: 'normal' })
   type: string;
 
+  @Column({ nullable: true })
+  hashedRefreshToken: string;
+
   // // Relationship with PROFILE
   @OneToOne(() => Profile, (profile) => profile.user)
   profile: Profile;

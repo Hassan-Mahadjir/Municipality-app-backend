@@ -29,6 +29,7 @@ export class UserService {
       where: {
         id: id,
       },
+      select: ['type', 'email', 'hashedRefreshToken'],
     });
 
     if (!user) throw new NotFoundException();
@@ -51,5 +52,12 @@ export class UserService {
         email: email,
       },
     });
+  }
+
+  async updateHashedRefreshToken(userId: number, hashedRefreshToken: string) {
+    return await this.userRepo.update(
+      { id: userId },
+      { hashedRefreshToken: hashedRefreshToken },
+    );
   }
 }

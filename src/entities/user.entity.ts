@@ -23,6 +23,9 @@ export class User {
   @CreateDateColumn()
   createAt: Date;
 
+  @Column({ default: 'normal' })
+  type: string;
+
   // // Relationship with PROFILE
   @OneToOne(() => Profile, (profile) => profile.user)
   profile: Profile;

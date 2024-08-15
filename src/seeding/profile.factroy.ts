@@ -11,6 +11,7 @@ export const ProfileFactory = setSeederFactory(Profile, (faker: Faker) => {
   profile.dateofBirth = faker.date.birthdate();
   profile.phone = faker.phone.number();
   profile.address = faker.location.city();
+  profile.description = faker.lorem.sentence(2);
 
   return profile;
 });

@@ -7,12 +7,15 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PaginationDTO } from 'src/staff/dto/pagination.dto';
-import { ParseIdPipe } from 'src/staff/pipes/paraseIdPipe';
+import { PaginationDTO } from 'src/user/dto/pagination.dto';
+import { ParseIdPipe } from 'src/user/pipes/paraseIdPipe';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -23,14 +26,10 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @Get()
-  findAll(@Query() PaginationDTO: PaginationDTO) {
-    return this.userService.findAll(PaginationDTO);
-  }
-
-  @Get(':id')
-  findOne(@Param('id', ParseIdPipe) id) {
-    return this.userService.findOne(id);
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@Req() req) {
+    return this.userService.findOne(req.user.id);
   }
 
   @Patch(':id')

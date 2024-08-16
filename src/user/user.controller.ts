@@ -21,6 +21,7 @@ import { Role } from 'src/auth/enums/role.enums';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 
+@Roles(Role.USER)
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -42,7 +43,7 @@ export class UserController {
   }
 
   // @SetMetadata("role",[Role.ADMIN])
-  @Roles(Role.ADMIN, Role.STAFF)
+  @Roles(Role.STAFF)
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
   @Delete(':id')

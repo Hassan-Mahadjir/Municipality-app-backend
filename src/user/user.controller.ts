@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
   Req,
+  SetMetadata,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -16,6 +17,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PaginationDTO } from 'src/user/dto/pagination.dto';
 import { ParseIdPipe } from 'src/user/pipes/paraseIdPipe';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
+import { Role } from 'src/auth/enums/role.enums';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 
 @Controller('user')
 export class UserController {
@@ -37,6 +41,10 @@ export class UserController {
     return this.userService.update(id, updateUserDto);
   }
 
+  // @SetMetadata("role",[Role.ADMIN])
+  @Roles(Role.ADMIN, Role.STAFF)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id', ParseIdPipe) id) {
     return this.userService.remove(id);

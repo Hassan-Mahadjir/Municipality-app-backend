@@ -29,7 +29,7 @@ export class UserService {
       where: {
         id: id,
       },
-      select: ['type', 'email', 'hashedRefreshToken'],
+      select: ['role', 'email', 'hashedRefreshToken'],
     });
 
     if (!user) throw new NotFoundException();

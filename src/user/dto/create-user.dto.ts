@@ -7,7 +7,4 @@ export class CreateUserDto {
   @IsString()
   @Length(6, 20)
   password: string;
-
-  @IsString()
-  type: 'normal';
 }

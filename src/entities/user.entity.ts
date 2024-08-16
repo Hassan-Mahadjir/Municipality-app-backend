@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Profile } from './profile.entity';
+import { Role } from '../auth/enums/role.enums';
 
 @Entity({ name: 'USER' })
 export class User {
@@ -23,8 +24,8 @@ export class User {
   @CreateDateColumn()
   createAt: Date;
 
-  @Column({ default: 'normal' })
-  type: string;
+  @Column({ type: 'enum', enum: Role, default: Role.USER })
+  role: Role;
 
   @Column({ nullable: true })
   hashedRefreshToken: string;

@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
 import { Profile } from 'src/entities/profile.entity';
 import { APP_PIPE } from '@nestjs/core';
+import { ProfileService } from 'src/profile/profile.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Profile])],
@@ -22,6 +23,7 @@ import { APP_PIPE } from '@nestjs/core';
       }),
     },
     UserService,
+    ProfileService,
   ],
 })
 export class UserModule {}

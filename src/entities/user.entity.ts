@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import * as argon2 from 'argon2';
 import { Profile } from './profile.entity';
 import { Role } from '../auth/enums/role.enums';
 
@@ -38,6 +39,6 @@ export class User {
   async hashPassword() {
     // hash Password and store it in DB
     // Salt as 10 is recommended for security and performance
-    this.password = await bcrypt.hash(this.password, 10);
+    this.password = await argon2.hash(this.password);
   }
 }

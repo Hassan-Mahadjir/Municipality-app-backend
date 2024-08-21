@@ -16,10 +16,12 @@ import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from './guards/roles/roles.guard';
 import googleOauthConfig from './config/google-oauth.config';
 import { GoogleStrategy } from './strategies/google.strategy';
+import { Profile } from 'src/entities/profile.entity';
+import { ProfileService } from 'src/profile/profile.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Profile]),
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(refreshJwtConfit),
@@ -28,6 +30,7 @@ import { GoogleStrategy } from './strategies/google.strategy';
   controllers: [AuthController],
   providers: [
     AuthService,
+    ProfileService,
     UserService,
     LocalStrategy,
     JwtStrategy,

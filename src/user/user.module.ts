@@ -14,7 +14,7 @@ import { ProfileService } from 'src/profile/profile.service';
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
-        whitelist: true,
+        // whitelist: true,
         forbidNonWhitelisted: true,
         transform: true,
         transformOptions: {

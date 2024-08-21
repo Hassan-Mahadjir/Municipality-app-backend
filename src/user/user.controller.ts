@@ -39,7 +39,14 @@ export class UserController {
   @Public()
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+    const { password, email, ...profileField } = createUserDto;
+
+    const profileData: CreateProfileDto = profileField as CreateProfileDto;
+
+    console.log(profileData);
+
+    return this.userService.create(createUserDto, profileData);
+    // return 'user has been created';
   }
 
   @UseGuards(JwtAuthGuard)

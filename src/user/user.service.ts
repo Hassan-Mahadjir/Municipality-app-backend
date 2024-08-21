@@ -6,15 +6,27 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationDTO } from 'src/user/dto/pagination.dto';
 import { DEFAULT_PAGE_SIZE } from 'src/utils/constants';
+import { CreateProfileDto } from 'src/profile/dto/create-profile.dto';
+import { ProfileService } from 'src/profile/profile.service';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
+  constructor(
+    @InjectRepository(User) private userRepo: Repository<User>,
+    private profileSrevice: ProfileService,
+  ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(
+    createUserDto: CreateUserDto,
+    createProfileDto?: CreateProfileDto,
+  ) {
     const user = this.userRepo.create(createUserDto);
+    await this.userRepo.save(user);
 
-    return await this.userRepo.save(user);
+    if (createProfileDto) {
+      const userProile = this.profileSrevice.create(user.id, createProfileDto);
+    }
+    return user;
   }
 
   async findAll(paginationDTO: PaginationDTO) {

@@ -13,6 +13,7 @@ import { ConfigType } from '@nestjs/config';
 import * as argon2 from 'argon2';
 import { CurrentUser } from './types/current-user';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { CreateProfileDto } from 'src/profile/dto/create-profile.dto';
 
 @Injectable()
 export class AuthService {
@@ -27,7 +28,7 @@ export class AuthService {
     const user = await this.userService.findByEmail(email);
     if (!user) throw new UnauthorizedException('User not found!');
 
-    const isPasswordMatch = await compare(password, user.password);
+    const isPasswordMatch = await argon2.verify(user.password, password);
     if (!isPasswordMatch) throw new UnauthorizedException('Invalid credetials');
 
     return { id: user.id };
@@ -94,10 +95,13 @@ export class AuthService {
     return currentUser;
   }
 
-  async validateGoogleUser(googleUser: CreateUserDto) {
+  async validateGoogleUser(
+    googleUser: CreateUserDto,
+    profileInfo: CreateProfileDto,
+  ) {
     const user = await this.userService.findByEmail(googleUser.email);
     if (user) return user;
 
-    return await this.userService.create(googleUser);
+    return await this.userService.create(googleUser, profileInfo);
   }
 }

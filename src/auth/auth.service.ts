@@ -104,4 +104,25 @@ export class AuthService {
 
     return await this.userService.create(googleUser, profileInfo);
   }
+
+  async changePassword(id: number, oldPassword: string, newPassword: string) {
+    const user = await this.userService.findOne(id);
+    if (!user) throw new NotFoundException('User not found!');
+
+    const isPasswordMatch = await argon2.verify(user.password, oldPassword);
+    if (!isPasswordMatch) throw new UnauthorizedException('Invalid credetials');
+
+    const newHashedPassword = await argon2.hash(newPassword);
+    return this.userService.updateHashedPassword(id, newHashedPassword);
+  }
+
+  async forgetPassword(email: string) {
+    const user = this.userService.findByEmail(email);
+    if (user) {
+    }
+    return {
+      message:
+        'If the this user exists, they will receive an email to reset the password.',
+    };
+  }
 }

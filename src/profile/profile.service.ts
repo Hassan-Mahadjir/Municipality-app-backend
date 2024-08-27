@@ -32,7 +32,7 @@ export class ProfileService {
   async findOne(id: number) {
     const userProfile = await this.profileRepo
       .createQueryBuilder('profile')
-      .innerJoin('profile.user', 'user')
+      .leftJoinAndSelect('profile.user', 'user')
       .where('profile.user.id = :id', { id })
       .getOne();
     if (!userProfile) {
@@ -40,7 +40,7 @@ export class ProfileService {
     }
     if (userProfile === null) {
       return "this is Hassan's profile";
-    } else return userProfile;
+    } else return { data: userProfile, message: 'Profile fetched' };
   }
 
   async update(id: number, updateProfileDto: UpdateProfileDto) {

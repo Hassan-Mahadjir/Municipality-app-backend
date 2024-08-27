@@ -1,9 +1,11 @@
 import {
+  Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
   Post,
+  Put,
   Req,
   Request,
   Res,
@@ -15,6 +17,8 @@ import { RefreshAuthGuard } from './guards/refresh-auth/refresh-auth.guard';
 import { JwtAuthGuard } from './guards/jwt-auth/jwt-auth.guard';
 import { Public } from './decorators/public.decorators';
 import { GoogleAuthGuard } from './guards/google-auth/google-auth.guard';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { ForgetPasswordDto } from './dto/forget-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -53,5 +57,24 @@ export class AuthController {
   async googleCallback(@Req() req, @Res() res) {
     const response = await this.authService.login(req.user.id);
     res.redirect(`http://localhost:8000?token=${response.data.accessToken}`);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('change-password')
+  async changePassword(
+    @Body() changePassordDto: ChangePasswordDto,
+    @Req() req,
+  ) {
+    return this.authService.changePassword(
+      req.user.id,
+      changePassordDto.oldPassword,
+      changePassordDto.newPassword,
+    );
+  }
+
+  // TODO: forget password
+  @Post('forget-password')
+  async forgetPassword(@Body() forgetPasswordDto: ForgetPasswordDto) {
+    return this.authService.forgetPassword(forgetPasswordDto.email);
   }
 }

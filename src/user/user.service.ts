@@ -8,6 +8,8 @@ import { PaginationDTO } from 'src/user/dto/pagination.dto';
 import { DEFAULT_PAGE_SIZE } from 'src/utils/constants';
 import { CreateProfileDto } from 'src/profile/dto/create-profile.dto';
 import { ProfileService } from 'src/profile/profile.service';
+import { ChangePasswordDto } from 'src/auth/dto/change-password.dto';
+import passport from 'passport';
 
 @Injectable()
 export class UserService {
@@ -41,7 +43,7 @@ export class UserService {
       where: {
         id: id,
       },
-      select: ['id', 'role', 'email', 'hashedRefreshToken'],
+      select: ['id', 'role', 'email', 'password', 'hashedRefreshToken'],
     });
 
     if (!user) throw new NotFoundException();
@@ -70,6 +72,13 @@ export class UserService {
     return await this.userRepo.update(
       { id: userId },
       { hashedRefreshToken: hashedRefreshToken },
+    );
+  }
+
+  async updateHashedPassword(userId: number, newHashedPassword: string) {
+    return await this.userRepo.update(
+      { id: userId },
+      { password: newHashedPassword },
     );
   }
 }

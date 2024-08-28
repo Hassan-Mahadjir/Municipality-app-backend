@@ -31,6 +31,12 @@ export class User {
   @Column({ nullable: true })
   hashedRefreshToken: string;
 
+  @Column({ nullable: true })
+  resetCode: string;
+
+  @Column({ nullable: true })
+  resetCodeExpiry: Date;
+
   // // Relationship with PROFILE
   @OneToOne(() => Profile, (profile) => profile.user)
   profile: Profile;

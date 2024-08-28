@@ -18,6 +18,7 @@ import googleOauthConfig from './config/google-oauth.config';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { Profile } from 'src/entities/profile.entity';
 import { ProfileService } from 'src/profile/profile.service';
+import { MailService } from 'src/mail/mail.service';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ProfileService } from 'src/profile/profile.service';
   providers: [
     AuthService,
     ProfileService,
+    MailService,
     UserService,
     LocalStrategy,
     JwtStrategy,

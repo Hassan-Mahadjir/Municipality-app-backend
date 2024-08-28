@@ -14,12 +14,14 @@ import * as argon2 from 'argon2';
 import { CurrentUser } from './types/current-user';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
 import { CreateProfileDto } from 'src/profile/dto/create-profile.dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
+    private mailService: MailService,
     @Inject(refreshJwtConfit.KEY)
     private refreshTokenConfig: ConfigType<typeof refreshJwtConfit>,
   ) {}
@@ -35,12 +37,6 @@ export class AuthService {
   }
 
   async login(userId: number) {
-    // const payload: AuthJwtPayload = { sub: userId };
-    // // Generate JWT token
-    // const token = this.jwtService.sign(payload);
-    // // Generate Refresh Token
-    // const refreshToken = this.jwtService.sign(payload, this.refreshTokenConfig);
-
     const { accessToken, refreshToken } = await this.generateTokens(userId);
     const hashedRefreshToken = await argon2.hash(refreshToken);
     await this.userService.updateHashedRefreshToken(userId, hashedRefreshToken);
@@ -117,12 +113,45 @@ export class AuthService {
   }
 
   async forgetPassword(email: string) {
-    const user = this.userService.findByEmail(email);
+    const user = await this.userService.findByEmail(email);
     if (user) {
+      const restCode = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit code
+      const hashedResetCode = await argon2.hash(restCode);
+      const expiryDate = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes expiry time
+
+      user.resetCode = hashedResetCode;
+      user.resetCodeExpiry = expiryDate;
+      await this.userService.update(user.id, {
+        resetCode: hashedResetCode,
+        resetCodeExpiry: expiryDate,
+      });
+
+      this.mailService.sendPasswordResetEmail(email, restCode);
     }
     return {
       message:
         'If the this user exists, they will receive an email to reset the password.',
     };
+  }
+
+  async resetPassword(email: string, resetCode: string, newPassword: string) {
+    const user = await this.userService.findByEmail(email);
+    if (!user || !user.resetCode) {
+      throw new UnauthorizedException('Invalid reset code.');
+    }
+
+    if (user.resetCodeExpiry < new Date()) {
+      throw new UnauthorizedException('Reset code has expired');
+    }
+
+    const isCodeValid = await argon2.verify(user.resetCode, resetCode);
+    if (!isCodeValid) throw new UnauthorizedException('Invalid reset code.');
+
+    const newHashedPassword = await argon2.hash(newPassword);
+    user.password = newHashedPassword;
+
+    await this.userService.update(user.id, { password: newHashedPassword });
+
+    return { message: 'Password has been successfully reset.' };
   }
 }

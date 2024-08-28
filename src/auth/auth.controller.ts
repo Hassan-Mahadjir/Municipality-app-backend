@@ -19,6 +19,8 @@ import { Public } from './decorators/public.decorators';
 import { GoogleAuthGuard } from './guards/google-auth/google-auth.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
+import { UpdateUserDto } from 'src/user/dto/update-user.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -73,8 +75,19 @@ export class AuthController {
   }
 
   // TODO: forget password
+  @Public()
   @Post('forget-password')
   async forgetPassword(@Body() forgetPasswordDto: ForgetPasswordDto) {
     return this.authService.forgetPassword(forgetPasswordDto.email);
+  }
+
+  @Public()
+  @Post('reset-password')
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(
+      resetPasswordDto.email,
+      resetPasswordDto.resetCode,
+      resetPasswordDto.password,
+    );
   }
 }

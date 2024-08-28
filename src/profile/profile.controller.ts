@@ -13,6 +13,7 @@ import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { ParseIdPipe } from 'src/user/pipes/paraseIdPipe';
+import { Public } from 'src/auth/decorators/public.decorators';
 
 @Controller('profile')
 export class ProfileController {
@@ -38,5 +39,11 @@ export class ProfileController {
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
     return this.profileService.update(id, updateProfileDto);
+  }
+
+  @Public()
+  @Delete(':id')
+  remove(@Param('id', ParseIdPipe) id) {
+    return this.profileService.remove(id);
   }
 }

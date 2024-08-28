@@ -55,6 +55,11 @@ export class UserService {
   }
 
   async remove(id: number) {
+    const userProfile = await this.profileSrevice.findOne(id);
+    const profileId = userProfile.data.id;
+    // Delete user profile
+    await this.profileSrevice.remove(profileId);
+    // Delete user's account
     return await this.userRepo.delete({
       id: id,
     });

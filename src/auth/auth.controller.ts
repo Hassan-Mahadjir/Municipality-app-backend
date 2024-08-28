@@ -19,7 +19,6 @@ import { Public } from './decorators/public.decorators';
 import { GoogleAuthGuard } from './guards/google-auth/google-auth.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
-import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')

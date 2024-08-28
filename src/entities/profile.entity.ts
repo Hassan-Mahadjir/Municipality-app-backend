@@ -6,11 +6,12 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './user.entity';
+import { Gendar } from 'src/auth/enums/gendar.enums';
 
 @Entity({ name: 'PROFILE' })
 export class Profile {
   @PrimaryGeneratedColumn()
-  profileId: number;
+  id: number;
 
   @Column()
   firstName: string;
@@ -24,7 +25,7 @@ export class Profile {
   @Column({ nullable: true })
   avatar: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'enum', enum: Gendar, nullable: true })
   gender: string;
 
   @Column({ nullable: true })

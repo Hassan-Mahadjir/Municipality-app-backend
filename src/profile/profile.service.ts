@@ -37,9 +37,6 @@ export class ProfileService {
       .getOne();
     if (!userProfile) {
       throw new NotFoundException('Profile not found');
-    }
-    if (userProfile === null) {
-      return "this is Hassan's profile";
     } else return { data: userProfile, message: 'Profile fetched' };
   }
 
@@ -57,7 +54,7 @@ export class ProfileService {
     // return result;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} profile`;
+  async remove(id: number) {
+    return await this.profileRepo.delete({ id: id });
   }
 }

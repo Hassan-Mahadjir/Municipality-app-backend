@@ -58,16 +58,14 @@ export class UserController {
     }
     return profile;
   }
-
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(@Param('id', ParseIdPipe) id, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);
   }
 
-  // @SetMetadata("role",[Role.ADMIN])
-  @Roles(Role.STAFF)
-  // @UseGuards(RolesGuard)
-  // @UseGuards(JwtAuthGuard)
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(@Param('id', ParseIdPipe) id) {
     return this.userService.remove(id);

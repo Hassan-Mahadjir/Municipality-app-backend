@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import * as argon2 from 'argon2';
 import { Profile } from './profile.entity';
 import { Role } from '../auth/enums/role.enums';
+import { Department } from './department.entity';
 
 @Entity({ name: 'USER' })
 export class User {
@@ -40,6 +41,10 @@ export class User {
   // // Relationship with PROFILE
   @OneToOne(() => Profile, (profile) => profile.user)
   profile: Profile;
+
+  // Relationshipe with DEPARTMENT
+  @OneToOne(() => Department, (department) => department.responsible)
+  department: Department;
 
   @BeforeInsert()
   async hashPassword() {

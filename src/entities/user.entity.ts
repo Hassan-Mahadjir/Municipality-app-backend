@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -11,6 +12,7 @@ import * as argon2 from 'argon2';
 import { Profile } from './profile.entity';
 import { Role } from '../auth/enums/role.enums';
 import { Department } from './department.entity';
+import { Request } from './request.entity';
 
 @Entity({ name: 'USER' })
 export class User {
@@ -45,6 +47,10 @@ export class User {
   // Relationshipe with DEPARTMENT
   @OneToOne(() => Department, (department) => department.responsible)
   department: Department;
+
+  // Relationshipe with REQUEST
+  @OneToMany(() => Request, (request) => request.user)
+  requests: Request[];
 
   @BeforeInsert()
   async hashPassword() {

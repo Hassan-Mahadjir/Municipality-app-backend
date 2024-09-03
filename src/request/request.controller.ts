@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { RequestService } from './request.service';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
+import { Public } from 'src/auth/decorators/public.decorators';
+import { ParseIdPipe } from 'src/user/pipes/paraseIdPipe';
 
 @Controller('request')
 export class RequestController {
@@ -12,9 +22,10 @@ export class RequestController {
     return this.requestService.create(createRequestDto);
   }
 
-  @Get()
-  findAll() {
-    return this.requestService.findAll();
+  @Public()
+  @Get(':id')
+  findAll(@Param('id', ParseIdPipe) id) {
+    return this.requestService.findAll(id);
   }
 
   @Get(':id')

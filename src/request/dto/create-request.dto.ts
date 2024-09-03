@@ -6,4 +6,7 @@ export class CreateRequestDto {
 
   @IsString()
   location: string;
+
+  @IsString()
+  message: string;
 }

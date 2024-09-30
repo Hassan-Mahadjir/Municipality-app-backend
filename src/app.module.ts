@@ -12,6 +12,7 @@ import dbConfig from './config/db.config';
 import dbConfigProduction from './config/db.config.production';
 import { APP_PIPE } from '@nestjs/core';
 import { RequestModule } from './request/request.module';
+import { TourismModule } from './tourism/tourism.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { RequestModule } from './request/request.module';
     MailModule,
     DepartmentModule,
     RequestModule,
+    TourismModule,
   ],
   controllers: [AppController],
   providers: [

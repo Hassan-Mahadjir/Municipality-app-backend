@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({name: "HISTORICAL PLACES"})
+@Entity({ name: 'HISTORICAL PLACES' })
 export class HistoricalPlace {
   @PrimaryGeneratedColumn()
   id: number;
@@ -28,6 +28,4 @@ export class HistoricalPlace {
 
   @Column()
   closeWeekends: string;
-
-  
 }

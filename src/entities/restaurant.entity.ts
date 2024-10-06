@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
-@Entity({name: "RESTAURANT"})
+@Entity({ name: 'RESTAURANT' })
 export class Restaurant {
   @PrimaryGeneratedColumn('increment')
   id: number;
@@ -15,7 +15,7 @@ export class Restaurant {
   weekends: boolean;
 
   @Column()
-  phone: string;  
+  phone: string;
 
   @Column()
   openWeekdays: string;
@@ -29,4 +29,3 @@ export class Restaurant {
   @Column()
   closeWeekends: string;
 }
-

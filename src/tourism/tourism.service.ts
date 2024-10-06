@@ -4,6 +4,9 @@ import { Repository } from 'typeorm';
 import { HistoricalPlace } from '../entities/historical-place.entity'; 
 import { Restaurant } from '../entities/restaurant.entity';
 import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
+import { UpdateHistoricalPlaceDto } from './dto/update-historical-place.dto';
+import { UpdateCommentDto } from './dto/update-comment.dto';
+import { UpdateImageDto } from './dto/update-image.dto';
 import { Comment } from '../entities/comment.entity';
 import { Image } from '../entities/image.entity'; 
 
@@ -35,6 +38,11 @@ export class TourismService {
   async removeHistoricalPLace(id: number): Promise<void> {
     await this.historicalPlaceRepository.delete(id);
   }
+
+  async updateHistoricalPlace(id: number, updateHistoricalPlaceDto: UpdateHistoricalPlaceDto): Promise<HistoricalPlace> {
+    await this.historicalPlaceRepository.update(id, updateHistoricalPlaceDto);
+    return this.historicalPlaceRepository.findOneBy({ id });
+  } 
 
   createRestaurant(restaurant: Restaurant): Promise<Restaurant> {
     return this.restaurantRepository.save(restaurant);
@@ -75,6 +83,11 @@ export class TourismService {
     await this.commentRepository.delete(id);
   }
 
+  async updateComment(id: number, updateCommentDto: UpdateCommentDto): Promise<Comment> {
+    await this.commentRepository.update(id, updateCommentDto);
+    return this.commentRepository.findOneBy({ id });
+  } 
+
   createImage(image: Image): Promise<Image> {
     return this.imageRepository.save(image);
   }
@@ -90,4 +103,9 @@ export class TourismService {
   async removeImage(id: number): Promise<void> {
     await this.imageRepository.delete(id);
   }
+
+  async updateImage(id: number, updateImageDto: UpdateImageDto): Promise<Image> {
+    await this.imageRepository.update(id, updateImageDto);
+    return this.imageRepository.findOneBy({ id });
+  } 
 }

@@ -3,7 +3,10 @@ import { HistoricalPlace } from '../entities/historical-place.entity';
 import { Restaurant } from '../entities/restaurant.entity';
 import { Comment } from '../entities/comment.entity';
 import { Image } from '../entities/image.entity';
+import { CreateHistoricalPlaceDto } from './dto/create-histroical-place.dto';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
+import { CreateCommentDto } from './dto/create-comment.dto';
+import { CreateImageDto } from './dto/create-image.dto';
 import { TourismService } from './tourism.service'
 
 @Controller('tourism')
@@ -28,6 +31,11 @@ export class TourismController {
   @Delete('/historical-place/:id')
   removeHistoricalPLace(@Param('id') id: number): Promise<void> {
     return this.tourismService.removeHistoricalPLace(id);
+  }
+
+  @Patch('/historical-place/:id')
+  updateHistoricalPlace(@Param('id') id: number, @Body() updateHistoricalPlaceDto: Partial<CreateHistoricalPlaceDto>): Promise<HistoricalPlace> {
+    return this.tourismService.updateHistoricalPlace(id, updateHistoricalPlaceDto);
   }
 
   @Get('/restaurant')
@@ -75,6 +83,11 @@ export class TourismController {
     return this.tourismService.removeComment(id);
   }
 
+  @Patch('/comment/:id')
+  updateComment(@Param('id') id: number, @Body() updateCommentDto: Partial<CreateCommentDto>): Promise<Comment> {
+    return this.tourismService.updateComment(id, updateCommentDto);
+  }
+
   @Get('/image')
   findAllImages(): Promise<Image[]> {
     return this.tourismService.findAllImages();
@@ -93,5 +106,10 @@ export class TourismController {
   @Delete('/image/:id')
   removeImage(@Param('id') id: number): Promise<void> {
     return this.tourismService.removeImage(id);
+  }
+
+  @Patch('/image/:id')
+  updateImage(@Param('id') id: number, @Body() updateImageDto: Partial<CreateImageDto>): Promise<Image> {
+    return this.tourismService.updateImage(id, updateImageDto);
   }
 }

@@ -19,8 +19,8 @@ export class MailService {
     const mailOptions = {
       from: this.configService.get('GOOGLE_MAIL_USER'),
       to: to,
-      subject: 'Password Reset Request',
-      html: `<p>This is your reset password code<br><strong>${resetCode}</strong></p>`,
+      subject: 'Verfication Code',
+      html: `<p>This is your code<br><strong>${resetCode}</strong></p>`,
     };
     // console.log(this.configService.get('GOOGLE_MAIL_PASSWORD'));
     await this.transporter.sendMail(mailOptions);

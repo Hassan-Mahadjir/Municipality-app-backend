@@ -19,6 +19,8 @@ import { GoogleStrategy } from './strategies/google.strategy';
 import { Profile } from 'src/entities/profile.entity';
 import { ProfileService } from 'src/profile/profile.service';
 import { MailService } from 'src/mail/mail.service';
+import { GoogleMobileStrategy } from './strategies/googleMobile.strategy';
+import googleMobileOauthConfig from './config/google-mobile-oauth.config';
 
 @Module({
   imports: [
@@ -27,6 +29,7 @@ import { MailService } from 'src/mail/mail.service';
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(refreshJwtConfit),
     ConfigModule.forFeature(googleOauthConfig),
+    ConfigModule.forFeature(googleMobileOauthConfig),
   ],
   controllers: [AuthController],
   providers: [
@@ -37,6 +40,7 @@ import { MailService } from 'src/mail/mail.service';
     LocalStrategy,
     JwtStrategy,
     RefreshJwtStrategy,
+    GoogleMobileStrategy,
     GoogleStrategy,
 
     // Apply Guard Authentication & Authoization Globally

@@ -112,7 +112,7 @@ export class AuthService {
     return this.userService.updateHashedPassword(id, newHashedPassword);
   }
 
-  async forgetPassword(email: string) {
+  async sendCodeEmail(email: string) {
     const user = await this.userService.findByEmail(email);
     if (user) {
       const restCode = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a 6-digit code
@@ -134,7 +134,18 @@ export class AuthService {
     };
   }
 
-  async resetPassword(email: string, resetCode: string, newPassword: string) {
+  async resetPassword(email: string, newPassword: string) {
+    const user = await this.userService.findByEmail(email);
+
+    const newHashedPassword = await argon2.hash(newPassword);
+    user.password = newHashedPassword;
+
+    await this.userService.update(user.id, { password: newHashedPassword });
+
+    return { message: 'Password has been successfully reset.' };
+  }
+
+  async validateCode(email: string, resetCode: string) {
     const user = await this.userService.findByEmail(email);
     if (!user || !user.resetCode) {
       throw new UnauthorizedException('Invalid reset code.');
@@ -147,11 +158,6 @@ export class AuthService {
     const isCodeValid = await argon2.verify(user.resetCode, resetCode);
     if (!isCodeValid) throw new UnauthorizedException('Invalid reset code.');
 
-    const newHashedPassword = await argon2.hash(newPassword);
-    user.password = newHashedPassword;
-
-    await this.userService.update(user.id, { password: newHashedPassword });
-
-    return { message: 'Password has been successfully reset.' };
+    return { message: 'the reset code is correct.', data: isCodeValid };
   }
 }

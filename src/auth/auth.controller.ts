@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Patch,
   Post,
   Put,
   Req,
@@ -20,6 +21,8 @@ import { GoogleAuthGuard } from './guards/google-auth/google-auth.guard';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ForgetPasswordDto } from './dto/forget-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { GoogleMobileAuthGuard } from './guards/google-auth/google-mobile-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -57,7 +60,24 @@ export class AuthController {
   @Get('google/callback')
   async googleCallback(@Req() req, @Res() res) {
     const response = await this.authService.login(req.user.id);
-    res.redirect(`http://localhost:8000?token=${response.data.accessToken}`);
+
+    // redirect to website
+    res.redirect(`http://localhost:8081?token=${response.data.accessToken}`);
+  }
+
+  @Public()
+  @UseGuards(GoogleMobileAuthGuard)
+  @Get('google/mobile-login')
+  googleMobileLogin() {}
+
+  @Public()
+  @UseGuards(GoogleMobileAuthGuard)
+  @Get('google/mobile-callback')
+  async googleMobileCallback(@Req() req, @Res() res) {
+    const response = await this.authService.login(req.user.id);
+
+    // redirect to app URL with token
+    res.redirect(`myapp://home?token=${response.data.accessToken}`);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -75,18 +95,26 @@ export class AuthController {
 
   // TODO: forget password
   @Public()
-  @Post('forget-password')
+  @Post('send-code-email')
   async forgetPassword(@Body() forgetPasswordDto: ForgetPasswordDto) {
-    return this.authService.forgetPassword(forgetPasswordDto.email);
+    return this.authService.sendCodeEmail(forgetPasswordDto.email);
   }
 
   @Public()
-  @Post('reset-password')
-  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+  @Patch('reset-password')
+  async resetPassword(@Body() resetPasswordDto: CreateUserDto) {
     return this.authService.resetPassword(
       resetPasswordDto.email,
-      resetPasswordDto.resetCode,
       resetPasswordDto.password,
+    );
+  }
+
+  @Public()
+  @Post('validate-resetCode')
+  async validateResetCode(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.validateCode(
+      resetPasswordDto.email,
+      resetPasswordDto.resetCode,
     );
   }
 }

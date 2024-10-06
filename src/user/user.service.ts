@@ -28,7 +28,7 @@ export class UserService {
     if (createProfileDto) {
       const userProile = this.profileSrevice.create(user.id, createProfileDto);
     }
-    return user;
+    return { message: 'The user is created successfully', data: user };
   }
 
   async findAll(paginationDTO: PaginationDTO) {

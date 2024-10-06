@@ -4,7 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaginationDTO } from 'src/user/dto/pagination.dto';
+import { PaginationDTO } from 'src/department/dto/pagination.dto';
 import { DEFAULT_PAGE_SIZE } from 'src/utils/constants';
 import { CreateProfileDto } from 'src/profile/dto/create-profile.dto';
 import { ProfileService } from 'src/profile/profile.service';

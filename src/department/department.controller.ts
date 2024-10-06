@@ -1,10 +1,19 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { DepartmentService } from './department.service';
 import { ParseIdPipe } from 'src/user/pipes/paraseIdPipe';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { Role } from 'src/auth/enums/role.enums';
+import { PaginationDTO } from './dto/pagination.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('department')
@@ -21,7 +30,7 @@ export class DepartmentController {
   }
 
   @Get()
-  findAll() {
-    return this.departmentService.findAll();
+  findAll(@Query() paginationDTO: PaginationDTO) {
+    return this.departmentService.findAll(paginationDTO);
   }
 }

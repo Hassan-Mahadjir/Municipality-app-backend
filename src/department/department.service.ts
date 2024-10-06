@@ -8,6 +8,8 @@ import { Department } from 'src/entities/department.entity';
 import { Repository } from 'typeorm';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UserService } from 'src/user/user.service';
+import { PaginationDTO } from './dto/pagination.dto';
+import { DEFAULT_PAGE_SIZE } from 'src/utils/constants';
 
 @Injectable()
 export class DepartmentService {
@@ -43,8 +45,11 @@ export class DepartmentService {
     return newDepartment;
   }
 
-  async findAll() {
-    const allServices = await this.departmentRepo.find();
+  async findAll(paginationDTO: PaginationDTO) {
+    const allServices = await this.departmentRepo.find({
+      skip: paginationDTO.skip,
+      take: paginationDTO.limit ?? DEFAULT_PAGE_SIZE,
+    });
     return { message: 'Status is 200', data: allServices };
   }
 }

@@ -16,7 +16,7 @@ import { ParseIdPipe } from 'src/user/pipes/paraseIdPipe';
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {}
 
-  @Post()
+  @Post(':id')
   create(
     @Body() createServiceDto: CreateServiceDto,
     @Param('id', ParseIdPipe) id,
@@ -24,23 +24,26 @@ export class ServiceController {
     return this.serviceService.create(id, createServiceDto);
   }
 
-  @Get()
-  findAll() {
-    return this.serviceService.findAll();
+  @Get('all/:id')
+  findDepartmentServices(@Param('id', ParseIdPipe) id) {
+    return this.serviceService.findDepartmentServices(id);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.serviceService.findOne(+id);
+  findOne(@Param('id', ParseIdPipe) id) {
+    return this.serviceService.findOneService(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateServiceDto: UpdateServiceDto) {
-    return this.serviceService.update(+id, updateServiceDto);
+  update(
+    @Param('id', ParseIdPipe) id,
+    @Body() updateServiceDto: UpdateServiceDto,
+  ) {
+    return this.serviceService.update(id, updateServiceDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.serviceService.remove(+id);
+  remove(@Param('id', ParseIdPipe) id) {
+    return this.serviceService.delete(id);
   }
 }

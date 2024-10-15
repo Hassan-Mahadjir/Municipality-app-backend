@@ -52,4 +52,12 @@ export class DepartmentService {
     });
     return { message: 'Status is 200', data: allServices };
   }
+
+  async findDepartment(id: number) {
+    return await this.departmentRepo.findOne({ where: { id: id } });
+  }
+
+  async findDepartmentbyName(name: string) {
+    return await this.departmentRepo.findOne({ where: { name: name } });
+  }
 }

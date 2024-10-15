@@ -6,4 +6,7 @@ export class CreateServiceDto {
 
   @IsString()
   imageUrl: string;
+
+  @IsString()
+  departmentName?: string;
 }

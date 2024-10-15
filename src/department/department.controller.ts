@@ -33,4 +33,9 @@ export class DepartmentController {
   findAll(@Query() paginationDTO: PaginationDTO) {
     return this.departmentService.findAll(paginationDTO);
   }
+
+  @Get(':id')
+  async findOne(@Param('id', ParseIdPipe) id) {
+    return await this.departmentService.findDepartment(id);
+  }
 }

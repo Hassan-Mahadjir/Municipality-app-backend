@@ -7,7 +7,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './user.entity';
-import { Service } from './service.entity';
+import { Pharmacy } from './pharmacy.entity';
+import { Hospital } from './hospitals.entity';
 
 @Entity({ name: 'DEPARTMENT' })
 export class Department {
@@ -31,7 +32,11 @@ export class Department {
   @JoinColumn({ name: 'responsible' })
   responsible: User;
 
-  //  Relationship with SERVICE
-  @OneToMany(() => Service, (service) => service.department)
-  services: Service[];
+  // Relationship with PHARAMCY
+  @OneToMany(() => Pharmacy, (pharmacy) => pharmacy.department)
+  pharmacies: Pharmacy[];
+
+  // Relationship with HOSPITAL
+  @OneToMany(() => Hospital, (hospital) => hospital.department)
+  hospitals: Hospital[];
 }

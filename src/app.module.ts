@@ -14,6 +14,7 @@ import { APP_PIPE } from '@nestjs/core';
 import { RequestModule } from './request/request.module';
 import { TourismModule } from './tourism/tourism.module';
 import { HealthModule } from './health/health.module';
+import { CollectedVehicleModule } from './collected-vehicle/collected-vehicle.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { HealthModule } from './health/health.module';
     DepartmentModule,
     RequestModule,
     TourismModule,
+    CollectedVehicleModule,
   ],
   controllers: [AppController],
   providers: [

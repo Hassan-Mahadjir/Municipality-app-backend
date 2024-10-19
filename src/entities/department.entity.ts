@@ -9,6 +9,7 @@ import {
 import { User } from './user.entity';
 import { Pharmacy } from './pharmacy.entity';
 import { Hospital } from './hospitals.entity';
+import { CollectedVehicle } from './collected-vehicle.entity';
 
 @Entity({ name: 'DEPARTMENT' })
 export class Department {
@@ -39,4 +40,8 @@ export class Department {
   // Relationship with HOSPITAL
   @OneToMany(() => Hospital, (hospital) => hospital.department)
   hospitals: Hospital[];
+
+  // Relationship with COLLECTED-VEHICLE
+  @OneToMany(() => CollectedVehicle, (vehicle) => vehicle.departmnet)
+  collectedVehicles: CollectedVehicle[];
 }

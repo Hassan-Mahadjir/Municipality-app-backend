@@ -13,6 +13,7 @@ import dbConfigProduction from './config/db.config.production';
 import { APP_PIPE } from '@nestjs/core';
 import { RequestModule } from './request/request.module';
 import { TourismModule } from './tourism/tourism.module';
+import { AppointmentModule } from './appointment/appointment.module';
 
 @Module({
   imports: [
@@ -32,13 +33,13 @@ import { TourismModule } from './tourism/tourism.module';
     DepartmentModule,
     RequestModule,
     TourismModule,
+    AppointmentModule,
   ],
   controllers: [AppController],
   providers: [
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
-        // whitelist: true,
         forbidNonWhitelisted: true,
         transform: true,
         transformOptions: {

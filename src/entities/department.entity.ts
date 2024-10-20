@@ -2,10 +2,12 @@ import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './user.entity';
+import { Appointment } from './appointment.entity';
 
 @Entity({ name: 'DEPARTMENT' })
 export class Department {
@@ -28,4 +30,7 @@ export class Department {
   @OneToOne(() => User, (user) => user.department)
   @JoinColumn({ name: 'responsible' })
   responsible: User;
+
+  @OneToMany(() => Appointment, (appointment) => appointment.department)
+  appointments:Appointment[];
 }

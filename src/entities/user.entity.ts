@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -11,6 +12,7 @@ import * as argon2 from 'argon2';
 import { Profile } from './profile.entity';
 import { Role } from '../auth/enums/role.enums';
 import { Department } from './department.entity';
+import { Appointment } from './appointment.entity';
 
 @Entity({ name: 'USER' })
 export class User {
@@ -52,4 +54,9 @@ export class User {
     // Salt as 10 is recommended for security and performance
     this.password = await argon2.hash(this.password);
   }
+
+
+  // relationship with appointemnt
+  @OneToMany(()=>Appointment,(appointment)=>appointment.user)
+  appointments:Appointment[];
 }

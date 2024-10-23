@@ -11,6 +11,7 @@ import { In, Repository } from 'typeorm';
 import { Station } from 'src/entities/station.entity';
 import { DepartmentService } from 'src/department/department.service';
 import { CreateStationDto } from './dto/create-station.dto';
+import { UpdateStation } from './dto/update-station.dto';
 
 @Injectable()
 export class BusService {
@@ -76,19 +77,77 @@ export class BusService {
     });
   }
 
-  update(id: number, updateBusDto: UpdateBusDto) {
-    return `This action updates a #${id} bus`;
+  async updateLine(id: number, updateBusDto: UpdateBusDto) {
+    // Find the existing line by ID
+    const line = await this.lineRepo.findOne({
+      where: { id: id },
+      relations: ['toStations'],
+    });
+
+    // Check if the line exists
+    if (!line) throw new NotFoundException(`Line with ID ${id} not found.`);
+
+    // Update properties
+    line.from = updateBusDto.from || line.from;
+    line.to = updateBusDto.to || line.to;
+
+    // Handle many-to-many relationship with stations if provided
+    if (updateBusDto.stationNames) {
+      const stations = await this.stationRepo.find({
+        where: { name: In(updateBusDto.stationNames) },
+      });
+
+      for (const stationName of updateBusDto.stationNames) {
+        // Check if the station name exists in the fetched stations
+        const stationExists = stations.some(
+          (station) => station.name === stationName,
+        );
+
+        if (!stationExists) {
+          throw new NotFoundException(
+            `The station: ${stationName} is not in the database. You need to add the station before proceeding.`,
+          );
+        }
+      }
+
+      line.toStations = stations; // Update teh toStations with the new list of stations
+    }
+
+    await this.lineRepo.save(line);
+
+    return { message: `Line wiht ID: ${id} has been updated.`, line };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} bus`;
+  async deleteLine(lineId: number) {
+    const line = await this.lineRepo.findOne({
+      where: { id: lineId },
+      relations: ['toStations'],
+    });
+
+    if (!line) {
+      throw new NotFoundException(`Line with ID ${lineId} not found.`);
+    }
+
+    for (let index = 0; index < line.toStations.length; index++) {
+      const station = line.toStations[index];
+
+      if (Array.isArray(station.route)) {
+        station.route = station.route.filter((s) => s.id !== lineId);
+
+        await this.stationRepo.save(station);
+      }
+    }
+
+    await this.lineRepo.remove(line);
+
+    return { message: `Line with ID ${lineId} has been deleted.` };
   }
 
   async createStation(createStationDTO: CreateStationDto) {
     return await this.stationRepo.save(createStationDTO);
   }
 
-  async updateStation(id: number, body: CreateStationDto) {
+  async updateStation(id: number, body: UpdateStation) {
     return await this.stationRepo.update({ id: id }, body);
   }
 

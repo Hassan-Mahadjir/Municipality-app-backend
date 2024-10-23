@@ -32,14 +32,14 @@ export class BusController {
     return this.busService.findOneLine(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBusDto: UpdateBusDto) {
-    return this.busService.update(+id, updateBusDto);
+  @Patch('line/:id')
+  update(@Param('id', ParseIdPipe) id, @Body() updateBusDto: UpdateBusDto) {
+    return this.busService.updateLine(id, updateBusDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.busService.remove(+id);
+  @Delete('line/:id')
+  deleteLine(@Param('id', ParseIdPipe) id) {
+    return this.busService.deleteLine(id);
   }
 
   @Post('add-station')

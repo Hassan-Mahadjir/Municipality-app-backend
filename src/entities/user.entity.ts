@@ -13,6 +13,7 @@ import { Profile } from './profile.entity';
 import { Role } from '../auth/enums/role.enums';
 import { Department } from './department.entity';
 import { Request } from './request.entity';
+import { Appointment } from './appointment.entity';
 
 @Entity({ name: 'USER' })
 export class User {
@@ -58,4 +59,8 @@ export class User {
     // Salt as 10 is recommended for security and performance
     this.password = await argon2.hash(this.password);
   }
+
+  // relationship with appointemnt
+  @OneToMany(() => Appointment, (appointment) => appointment.user)
+  appointments: Appointment[];
 }

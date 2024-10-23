@@ -15,6 +15,8 @@ import { RequestModule } from './request/request.module';
 import { TourismModule } from './tourism/tourism.module';
 import { HealthModule } from './health/health.module';
 import { CollectedVehicleModule } from './collected-vehicle/collected-vehicle.module';
+import { AppointmentModule } from './appointment/appointment.module';
+import { BusModule } from './bus/bus.module';
 
 @Module({
   imports: [
@@ -36,13 +38,14 @@ import { CollectedVehicleModule } from './collected-vehicle/collected-vehicle.mo
     RequestModule,
     TourismModule,
     CollectedVehicleModule,
+    AppointmentModule,
+    BusModule,
   ],
   controllers: [AppController],
   providers: [
     {
       provide: APP_PIPE,
       useValue: new ValidationPipe({
-        // whitelist: true,
         forbidNonWhitelisted: true,
         transform: true,
         transformOptions: {

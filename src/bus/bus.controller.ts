@@ -12,6 +12,8 @@ import { CreateLineDto } from './dto/create-line.dto';
 import { UpdateBusDto } from './dto/update-line.dto';
 import { CreateStationDto } from './dto/create-station.dto';
 import { ParseIdPipe } from 'src/user/pipes/paraseIdPipe';
+import { CreateSechduleDto } from './dto/create-sechdule.dto';
+import { UpdateSechduleDto } from './dto/update-sechdule.dto';
 
 @Controller('bus')
 export class BusController {
@@ -68,5 +70,15 @@ export class BusController {
   @Delete('station/:id')
   deleteStation(@Param('id', ParseIdPipe) id) {
     return this.busService.deleteStation(id);
+  }
+
+  @Post('add-sechdule')
+  createSechdule(@Body() createSechduleDto: CreateSechduleDto) {
+    return this.busService.createSechdule(createSechduleDto);
+  }
+
+  @Post('add-time')
+  createBusTime(@Body() updateSechduleDto: UpdateSechduleDto) {
+    return this.busService.createBusTime(updateSechduleDto);
   }
 }

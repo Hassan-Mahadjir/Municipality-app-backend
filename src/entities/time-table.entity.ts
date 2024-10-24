@@ -1,11 +1,5 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Sechdule } from './sechdule.entity';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Day } from './day.entity';
 
 @Entity({ name: 'TIME TABLE' })
 export class TimeTable {
@@ -18,8 +12,7 @@ export class TimeTable {
   @Column()
   returnTime: string;
 
-  //   Relationship with SECHDULE
-  @ManyToOne(() => Sechdule, (sechdule) => sechdule.timeTables)
-  @JoinColumn({ name: 'dayId' })
-  day: Sechdule;
+  //Relationship with DAY
+  @ManyToMany(() => Day, (day) => day.timeTable)
+  days: Day[];
 }

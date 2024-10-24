@@ -12,6 +12,10 @@ import { Station } from 'src/entities/station.entity';
 import { DepartmentService } from 'src/department/department.service';
 import { CreateStationDto } from './dto/create-station.dto';
 import { UpdateStation } from './dto/update-station.dto';
+import { CreateSechduleDto } from './dto/create-sechdule.dto';
+import { Day } from 'src/entities/day.entity';
+import { TimeTable } from 'src/entities/time-table.entity';
+import { UpdateSechduleDto } from './dto/update-sechdule.dto';
 
 @Injectable()
 export class BusService {
@@ -19,6 +23,8 @@ export class BusService {
     @InjectRepository(Line) private lineRepo: Repository<Line>,
     @InjectRepository(Station) private stationRepo: Repository<Station>,
     private departmentService: DepartmentService,
+    @InjectRepository(Day) private dayRepo: Repository<Day>,
+    @InjectRepository(TimeTable) private timeTableRepo: Repository<TimeTable>,
   ) {}
 
   async create(createBusDto: CreateLineDto) {
@@ -190,5 +196,91 @@ export class BusService {
     await this.stationRepo.remove(station);
 
     return { message: `Station with ID ${stationId} has been deleted.` };
+  }
+
+  async createBusTime(createTimesDto: UpdateSechduleDto) {
+    for (let index = 0; index < createTimesDto.goTimes.length; index++) {
+      let goTime = createTimesDto.goTimes[index];
+      let returnTime = createTimesDto.returnTimes[index];
+
+      // Check if goTime already exists
+      const existingGoTime = await this.timeTableRepo.findOne({
+        where: { goTime: goTime },
+      });
+
+      // Check if returnTime already exists
+      const existingReturnTime = await this.timeTableRepo.findOne({
+        where: { returnTime: returnTime },
+      });
+
+      // Only create new bus time if neither goTime nor returnTime exist
+      if (!existingGoTime && !existingReturnTime) {
+        let newBusTime = this.timeTableRepo.create({
+          goTime: goTime,
+          returnTime: returnTime,
+        });
+        await this.timeTableRepo.save(newBusTime);
+      } else {
+        console.log(
+          `Duplicate found: goTime=${goTime} or returnTime=${returnTime}. Skipping...`,
+        );
+      }
+    }
+  }
+
+  async createSechdule(createSechduleDto: CreateSechduleDto) {
+    // Check if the day already exists
+    let day = await this.dayRepo.findOne({
+      where: { day: createSechduleDto.day },
+      relations: ['timeTable'], // Ensure timeTable relationship is fetched
+    });
+
+    if (day) {
+      // Get all goTimes that match the ones in createSechduleDto.goTimes
+      const goTimes = await this.timeTableRepo.find({
+        where: { goTime: In(createSechduleDto.goTimes) },
+      });
+
+      // Check for each goTime if it exists in the database
+      for (const goTime of createSechduleDto.goTimes) {
+        const timeExists = goTimes.some((time) => time.goTime === goTime);
+
+        if (!timeExists) {
+          throw new NotFoundException(
+            `The goTime: ${goTime} is not in the database. You need to add the time before proceeding.`,
+          );
+        }
+      }
+
+      const timeTables = await this.timeTableRepo.find({
+        where: { goTime: In(createSechduleDto.goTimes) },
+      });
+
+      // Safe times to database
+      day.timeTable = timeTables;
+
+      return this.dayRepo.save(day);
+    } else {
+      // If the day doesn't exist, create a new one
+      const newDay = this.dayRepo.create({
+        day: createSechduleDto.day,
+      });
+
+      // Save the new day to the database
+      const savedDay = await this.dayRepo.save(newDay);
+
+      // Optionally, you could link valid times to the day, if needed
+      // Example (assuming times are already in the database):
+      const timeTables = await this.timeTableRepo.find({
+        where: { goTime: In(createSechduleDto.goTimes) },
+      });
+
+      savedDay.timeTable = timeTables;
+
+      // Save the relationship
+      await this.dayRepo.save(savedDay);
+
+      return savedDay;
+    }
   }
 }

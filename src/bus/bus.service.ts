@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -229,58 +230,135 @@ export class BusService {
   }
 
   async createSechdule(createSechduleDto: CreateSechduleDto) {
-    // Check if the day already exists
-    let day = await this.dayRepo.findOne({
-      where: { day: createSechduleDto.day },
-      relations: ['timeTable'], // Ensure timeTable relationship is fetched
+    // Step 1: Check if all goTimes exist in the database
+    const existingTimeTables = await this.timeTableRepo.find({
+      where: { goTime: In(createSechduleDto.goTimes) },
     });
 
-    if (day) {
-      // Get all goTimes that match the ones in createSechduleDto.goTimes
-      const goTimes = await this.timeTableRepo.find({
-        where: { goTime: In(createSechduleDto.goTimes) },
-      });
+    // Get the goTimes that are found in the database
+    const existingGoTimes = existingTimeTables.map((tt) => tt.goTime);
 
-      // Check for each goTime if it exists in the database
-      for (const goTime of createSechduleDto.goTimes) {
-        const timeExists = goTimes.some((time) => time.goTime === goTime);
+    // Step 2: Find goTimes that are missing in the database
+    const missingGoTimes = createSechduleDto.goTimes.filter(
+      (goTime) => !existingGoTimes.includes(goTime),
+    );
 
-        if (!timeExists) {
-          throw new NotFoundException(
-            `The goTime: ${goTime} is not in the database. You need to add the time before proceeding.`,
+    // Step 3: If any goTimes are missing, throw an error
+    if (missingGoTimes.length > 0) {
+      throw new NotFoundException(
+        `The following goTimes are not in the database: ${missingGoTimes.join(', ')}. Please add these times first.`,
+      );
+    }
+
+    // Step 4: Check if a day with the same name already exists
+    const existingDay = await this.dayRepo.find({
+      where: { day: createSechduleDto.day },
+      relations: ['timeTable'], // Fetch timeTable relationship
+    });
+
+    if (existingDay.length > 0) {
+      for (const day of existingDay) {
+        // Step 5: Get the existing goTimes for each day entry
+        const existingDayGoTimes = day.timeTable.map(
+          (timeTable) => timeTable.goTime,
+        );
+
+        // Step 6: Sort both arrays for easier comparison
+        const sortedExistingGoTimes = existingDayGoTimes.sort();
+        const sortedNewGoTimes = [...createSechduleDto.goTimes].sort();
+
+        // Step 7: Compare both arrays exactly; if they match, throw an error
+        const goTimesMatch =
+          sortedExistingGoTimes.length === sortedNewGoTimes.length &&
+          sortedExistingGoTimes.every(
+            (time, index) => time === sortedNewGoTimes[index],
+          );
+
+        if (goTimesMatch) {
+          throw new ConflictException(
+            `The goTimes for ${createSechduleDto.day} already exist and are identical. No new entry created.`,
           );
         }
       }
-
-      const timeTables = await this.timeTableRepo.find({
-        where: { goTime: In(createSechduleDto.goTimes) },
-      });
-
-      // Safe times to database
-      day.timeTable = timeTables;
-
-      return this.dayRepo.save(day);
-    } else {
-      // If the day doesn't exist, create a new one
-      const newDay = this.dayRepo.create({
-        day: createSechduleDto.day,
-      });
-
-      // Save the new day to the database
-      const savedDay = await this.dayRepo.save(newDay);
-
-      // Optionally, you could link valid times to the day, if needed
-      // Example (assuming times are already in the database):
-      const timeTables = await this.timeTableRepo.find({
-        where: { goTime: In(createSechduleDto.goTimes) },
-      });
-
-      savedDay.timeTable = timeTables;
-
-      // Save the relationship
-      await this.dayRepo.save(savedDay);
-
-      return savedDay;
     }
+
+    // Step 8: If no exact match is found, create a new day with the new goTimes
+    const newDay = this.dayRepo.create({
+      day: createSechduleDto.day,
+    });
+
+    // Assign the valid timeTable entries to the new day
+    newDay.timeTable = existingTimeTables;
+
+    // Step 9: Save the new day
+    return await this.dayRepo.save(newDay);
+  }
+
+  async updateBusTime(dayId: number, updateBusTimeDto: UpdateSechduleDto) {
+    // Step 1: Retrieve the day by id with existing timeTable relations
+    const day = await this.dayRepo.findOne({
+      where: { id: dayId },
+      relations: ['timeTable'],
+    });
+
+    if (!day) {
+      throw new NotFoundException(`Day with ID ${dayId} not found.`);
+    }
+
+    // Step 2: Update the day name if provided
+    if (updateBusTimeDto.day) {
+      day.day = updateBusTimeDto.day;
+    }
+
+    // Step 3: Update goTimes if provided, ensuring no duplicates
+    if (updateBusTimeDto.goTimes && Array.isArray(updateBusTimeDto.goTimes)) {
+      // Remove duplicate goTimes from the request
+      const uniqueGoTimes = Array.from(new Set(updateBusTimeDto.goTimes));
+
+      // Check if all unique goTimes are present in the timeTableRepo
+      const newGoTimes = await this.timeTableRepo.find({
+        where: { goTime: In(uniqueGoTimes) },
+      });
+
+      if (newGoTimes.length !== uniqueGoTimes.length) {
+        // Identify missing goTimes by checking if each unique goTime is in newGoTimes
+        const missingGoTimes = uniqueGoTimes.filter(
+          (goTime) => !newGoTimes.some((time) => time.goTime === goTime),
+        );
+
+        // Throw an error listing each missing goTime
+        throw new NotFoundException(
+          `The following goTimes are not in the database: ${missingGoTimes.join(', ')}. Please add these times before updating.`,
+        );
+      }
+
+      // Replace the existing timeTable entries with the new ones
+      day.timeTable = newGoTimes;
+    }
+
+    // Step 4: Save the updated day
+    return await this.dayRepo.save(day);
+  }
+
+  async deleteBusTime(dayId: number) {
+    const day = await this.dayRepo.findOne({
+      where: { id: dayId },
+      relations: ['timeTable'],
+    });
+
+    if (!day) {
+      throw new NotFoundException(`Day with ID ${dayId} not found.`);
+    }
+
+    // Remove the associated times by clearing the timeTable relationship
+    day.timeTable = [];
+    await this.dayRepo.save(day);
+
+    // Now proceed to delete the day itself
+    await this.dayRepo.remove(day);
+
+    return {
+      message: `The Day with ID ${dayId} and its associated times have been removed.`,
+    };
   }
 }

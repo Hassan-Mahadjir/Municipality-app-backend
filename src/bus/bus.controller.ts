@@ -81,4 +81,17 @@ export class BusController {
   createBusTime(@Body() updateSechduleDto: UpdateSechduleDto) {
     return this.busService.createBusTime(updateSechduleDto);
   }
+
+  @Patch('update-time/:id')
+  updateBusTime(
+    @Param('id', ParseIdPipe) id,
+    @Body() updateSechduleDto: UpdateSechduleDto,
+  ) {
+    return this.busService.updateBusTime(id, updateSechduleDto);
+  }
+
+  @Delete('time/:id')
+  deleteBusTime(@Param('id', ParseIdPipe) id) {
+    return this.busService.deleteBusTime(id);
+  }
 }

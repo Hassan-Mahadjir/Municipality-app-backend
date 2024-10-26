@@ -12,6 +12,7 @@ import { Hospital } from './hospitals.entity';
 import { CollectedVehicle } from './collected-vehicle.entity';
 import { Appointment } from './appointment.entity';
 import { Line } from './line.entity';
+import { DisasterPoint } from './disaster-point.entity';
 
 @Entity({ name: 'DEPARTMENT' })
 export class Department {
@@ -54,4 +55,8 @@ export class Department {
   // Relationship with LINE
   @OneToMany(() => Line, (line) => line.department)
   lines: Line[];
+
+  // Relationship with DISASTER POINT
+  @OneToMany(() => DisasterPoint, (disasterPoint) => disasterPoint.department)
+  disasterPoints: DisasterPoint[];
 }

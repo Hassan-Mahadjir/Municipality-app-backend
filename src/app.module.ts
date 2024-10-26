@@ -17,6 +17,7 @@ import { HealthModule } from './health/health.module';
 import { CollectedVehicleModule } from './collected-vehicle/collected-vehicle.module';
 import { AppointmentModule } from './appointment/appointment.module';
 import { BusModule } from './bus/bus.module';
+import { DisasterPointModule } from './disaster-point/disaster-point.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { BusModule } from './bus/bus.module';
     CollectedVehicleModule,
     AppointmentModule,
     BusModule,
+    DisasterPointModule,
   ],
   controllers: [AppController],
   providers: [

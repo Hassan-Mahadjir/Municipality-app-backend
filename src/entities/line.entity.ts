@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Department } from './department.entity';
 import { Station } from './station.entity';
+import { Day } from './day.entity';
 
 @Entity({ name: 'LINE' })
 export class Line {
@@ -31,4 +32,9 @@ export class Line {
   @ManyToMany(() => Station, (station) => station.route)
   @JoinTable({ name: 'LINE_STATION' })
   toStations: Station[];
+
+  // Relationship wiht DAY
+  @ManyToMany(() => Day, (day) => day.path)
+  @JoinTable({ name: 'BUS_SECHDULE' })
+  sechdule: Day[];
 }

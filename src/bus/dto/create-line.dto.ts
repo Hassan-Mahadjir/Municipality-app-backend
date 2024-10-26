@@ -1,4 +1,5 @@
-import { IsArray, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsArray, IsNumber, IsString, ValidateNested } from 'class-validator';
 
 export class CreateLineDto {
   @IsString()
@@ -12,4 +13,17 @@ export class CreateLineDto {
 
   @IsArray()
   stationNames: string[];
+
+  @IsArray()
+  @ValidateNested({ each: true }) // Validate each object in the array
+  @Type(() => WorkingDayDto) // Transform plain objects into instances of WorkingDayDto
+  workingDaysTimes: WorkingDayDto[];
+}
+
+class WorkingDayDto {
+  @IsString()
+  day: string;
+
+  @IsNumber()
+  id: number;
 }

@@ -32,6 +32,13 @@ export class BusService {
     const department = await this.departmentService.findDepartmentbyName(
       createBusDto.departmentName,
     );
+    const ids = createBusDto.workingDaysTimes.map((item) => item.id);
+    const days = await this.dayRepo.find({ where: { id: In(ids) } });
+
+    // Check if all provided IDs are present in the fetched days
+    const fetchedIds = days.map((day) => day.id);
+    const missingIds = ids.filter((id) => !fetchedIds.includes(id));
+
     if (!department)
       throw new NotFoundException(
         `The department with ${createBusDto.departmentName} does not exists.`,
@@ -41,6 +48,12 @@ export class BusService {
       throw new UnauthorizedException(
         'The service is not allowed to be assigned here',
       );
+
+    if (missingIds.length > 0) {
+      throw new NotFoundException(
+        `The following days with IDs are not found in the database: ${missingIds.join(', ')}. Please add these days first.`,
+      );
+    }
 
     const stations = await this.stationRepo.find({
       where: { name: In(createBusDto.stationNames) },
@@ -68,19 +81,22 @@ export class BusService {
       to: createBusDto.to,
       department: department,
       toStations: stations,
+      sechdule: days,
     });
 
     return await this.lineRepo.save(newLine);
   }
 
   async findAll() {
-    return await this.lineRepo.find({ relations: ['toStations'] });
+    return await this.lineRepo.find({
+      relations: ['toStations', 'sechdule', 'sechdule.timeTable'],
+    });
   }
 
   async findOneLine(id: number) {
     return await this.lineRepo.findOne({
       where: { id: id },
-      relations: ['toStations'],
+      relations: ['toStations', 'sechdule', 'sechdule.timeTable'],
     });
   }
 
@@ -88,7 +104,7 @@ export class BusService {
     // Find the existing line by ID
     const line = await this.lineRepo.findOne({
       where: { id: id },
-      relations: ['toStations'],
+      relations: ['toStations', 'sechdule', 'sechdule.timeTable'],
     });
 
     // Check if the line exists
@@ -118,6 +134,23 @@ export class BusService {
       }
 
       line.toStations = stations; // Update teh toStations with the new list of stations
+    }
+
+    // Handle many-to-many relationship with days (sechdule) if provided
+    if (updateBusDto.workingDaysTimes) {
+      const ids = updateBusDto.workingDaysTimes.map((item) => item.id);
+      const days = await this.dayRepo.find({ where: { id: In(ids) } });
+
+      const fetchedIds = days.map((day) => day.id);
+      const missingIds = ids.filter((id) => !fetchedIds.includes(id));
+
+      if (missingIds.length > 0) {
+        throw new NotFoundException(
+          `The following days with IDs are not found in the database: ${missingIds.join(', ')}. Please add these days first.`,
+        );
+      }
+
+      line.sechdule = days; // Update days with the new list
     }
 
     await this.lineRepo.save(line);

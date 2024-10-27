@@ -127,15 +127,51 @@ export class AppointmentService {
     return appointments;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} appointment`;
+  async findOne(id: number) {
+    const appointment = await this.appointmentRepo.findOne({
+      where: { id: id },
+      relations: ['availability', 'availability.day', 'user.profile'],
+    });
+    if (!appointment)
+      throw new NotFoundException(
+        `The appointment with #ID:${id} does not exits.`,
+      );
+    return appointment;
   }
 
-  update(id: number, updateAppointmentDto: UpdateAppointmentDto) {
-    return `This action updates a #${id} appointment`;
+  async update(id: number, updateAppointmentDto: UpdateAppointmentDto) {
+    const appointment = await this.appointmentRepo.findOne({
+      where: { id: id },
+      relations: ['availability', 'availability.day', 'user.profile'],
+    });
+    if (!appointment)
+      throw new NotFoundException(
+        `The appointment with #ID:${id} does not exits.`,
+      );
+    await this.appointmentRepo.update({ id: id }, updateAppointmentDto);
+    return { message: `Appointment with #${id} successfully updated` };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} appointment`;
+  async remove(id: number) {
+    // Find the appointment by ID
+    const appointment = await this.appointmentRepo.findOne({
+      where: { id },
+      relations: ['availability'], // Include availability in the query
+    });
+
+    if (!appointment) {
+      throw new NotFoundException(`Appointment with ID #${id} not found`);
+    }
+
+    // Clear the associated availability so the slot is reusable
+    if (appointment.availability) {
+      appointment.availability.appointment = null; // Break the relationship
+      await this.availabilityRepo.save(appointment.availability); // Save updated availability
+    }
+
+    // Delete the appointment
+    await this.appointmentRepo.delete(id);
+
+    return { message: `Appointment #${id} successfully removed` };
   }
 }

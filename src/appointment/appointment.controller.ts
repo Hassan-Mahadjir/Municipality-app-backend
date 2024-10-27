@@ -17,17 +17,17 @@ import { ParseIdPipe } from 'src/user/pipes/paraseIdPipe';
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
 
+  @Post('/slot')
+  createSlots(@Body() createSlotDto: CreateSlotDto) {
+    return this.appointmentService.createSlot(createSlotDto);
+  }
+
   @Post('/:id')
   create(
     @Body() createAppointmentDto: CreateAppointmentDto,
     @Param('id', ParseIdPipe) id,
   ) {
     return this.appointmentService.create(createAppointmentDto, id);
-  }
-
-  @Post('/slot')
-  createSlots(@Body() createSlotDto: CreateSlotDto) {
-    return this.appointmentService.createSlot(createSlotDto);
   }
 
   @Get()

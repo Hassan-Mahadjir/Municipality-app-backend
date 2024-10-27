@@ -9,4 +9,7 @@ export class CreateRequestDto {
 
   @IsString()
   message: string;
+
+  @IsString()
+  departmentName: string;
 }

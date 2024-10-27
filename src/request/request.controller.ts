@@ -15,17 +15,25 @@ import { ParseIdPipe } from 'src/user/pipes/paraseIdPipe';
 
 @Controller('request')
 export class RequestController {
-  constructor(private readonly requestService: RequestService) {}
+  constructor(private requestService: RequestService) {}
 
-  @Post()
-  create(@Body() createRequestDto: CreateRequestDto) {
-    return this.requestService.create(createRequestDto);
+  @Post(':id')
+  create(
+    @Body() createRequestDto: CreateRequestDto,
+    @Param('id', ParseIdPipe) id,
+  ) {
+    return this.requestService.create(createRequestDto, id);
   }
 
   @Public()
-  @Get(':id')
-  findAll(@Param('id', ParseIdPipe) id) {
-    return this.requestService.findAll(id);
+  @Get()
+  findAll() {
+    return this.requestService.findAll();
+  }
+
+  @Get('/user-requests/:id')
+  findUseRequest(@Param('id', ParseIdPipe) id) {
+    return this.requestService.findUserRequests(id);
   }
 
   @Get(':id')

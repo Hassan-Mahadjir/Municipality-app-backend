@@ -1,32 +1,35 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  OneToOne,
+} from 'typeorm';
 import { User } from './user.entity';
-import { Department } from './department.entity';
+import { Availability } from './availability.entity';
 
-@Entity('APPOINTMENTS')
+@Entity('APPOINTMENT')
 export class Appointment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'date' })
-  appointmentDate: string;
-
-  @Column({ type: 'varchar', length: 50 })
-  appointmentTime: string;
-
-  @Column({ type: 'varchar', length: 255 })
+  @Column()
   purpose: string;
 
-  @Column({ type: 'varchar', length: 50, default: 'pending' })
+  @Column({ default: 'Pending' })
   status: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column()
   appointmentWith: string;
 
-  @ManyToOne(()=>User, (user)=>user.appointments)
-  @JoinColumn({name:"userId"})
-  user:User;
+  // Relationship with USER
+  @ManyToOne(() => User, (user) => user.userAppointments)
+  @JoinColumn({ name: 'userId' })
+  user: User;
 
-  @ManyToOne(()=>Department, (department)=>department.appointments)
-  @JoinColumn({name:"departmentId"})
-  department: Department;  
+  // Relationship with AVAILABILITY
+  @OneToOne(() => Availability, (availability) => availability.appointment)
+  @JoinColumn({ name: 'availabilityId' })
+  availability: Availability;
 }

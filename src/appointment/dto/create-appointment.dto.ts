@@ -1,7 +1,15 @@
+import { IsString } from 'class-validator';
+
 export class CreateAppointmentDto {
-    appointmentDate: string;
-    appointmentTime: string;
-    purpose: string;
-    appointmentWith: string;
-    departmentName: string
-  }
+  @IsString()
+  purpose: string;
+
+  @IsString()
+  appointmentWith: string;
+
+  @IsString()
+  date: string;
+
+  @IsString()
+  startTime: string;
+}

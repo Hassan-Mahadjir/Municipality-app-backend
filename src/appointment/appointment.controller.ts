@@ -1,35 +1,55 @@
-import { Controller, Get, Post, Param, Body, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { AppointmentService } from './appointment.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
+import { UpdateAppointmentDto } from './dto/update-appointment.dto';
+import { CreateSlotDto } from './dto/create-slot.dto';
+import { ParseIdPipe } from 'src/user/pipes/paraseIdPipe';
 
 @Controller('appointment')
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
 
-  // Check if a specific day is full
-  @Get('is-day-full/:date')
-  async isDayFull(@Param('date') date: string) {
-    const isFull = await this.appointmentService.isDayFull(date);
-    return { isFull };
+  @Post('/:id')
+  create(
+    @Body() createAppointmentDto: CreateAppointmentDto,
+    @Param('id', ParseIdPipe) id,
+  ) {
+    return this.appointmentService.create(createAppointmentDto, id);
   }
 
-  // Check if a specific time slot is reserved
-  @Get('is-time-reserved/:date/:time')
-  async isTimeReserved(@Param('date') date: string, @Param('time') time: string) {
-    const isReserved = await this.appointmentService.isTimeReserved(date, time);
-    return { isReserved };
+  @Post('/slot')
+  createSlots(@Body() createSlotDto: CreateSlotDto) {
+    return this.appointmentService.createSlot(createSlotDto);
   }
 
-  // Create a new appointment
-  @Post('/appointment/:id')
-  async createAppointment(@Body() createAppointmentDto: CreateAppointmentDto, @Param('userId') userId: string) {
-    const { appointmentDate, appointmentTime } = createAppointmentDto;
-    
+  @Get()
+  findAll() {
+    return this.appointmentService.findAll();
+  }
 
-    if (await this.appointmentService.isTimeReserved(appointmentDate, appointmentTime)) {
-      throw new BadRequestException('This time slot is already reserved.');
-    }
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.appointmentService.findOne(+id);
+  }
 
-    return await this.appointmentService.createAppointment(createAppointmentDto, +userId);
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() updateAppointmentDto: UpdateAppointmentDto,
+  ) {
+    return this.appointmentService.update(+id, updateAppointmentDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.appointmentService.remove(+id);
   }
 }

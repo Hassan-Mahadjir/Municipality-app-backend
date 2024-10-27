@@ -15,9 +15,9 @@ import { RequestModule } from './request/request.module';
 import { TourismModule } from './tourism/tourism.module';
 import { HealthModule } from './health/health.module';
 import { CollectedVehicleModule } from './collected-vehicle/collected-vehicle.module';
-import { AppointmentModule } from './appointment/appointment.module';
 import { BusModule } from './bus/bus.module';
 import { DisasterPointModule } from './disaster-point/disaster-point.module';
+import { AppointmentModule } from './appointment/appointment.module';
 
 @Module({
   imports: [
@@ -39,9 +39,9 @@ import { DisasterPointModule } from './disaster-point/disaster-point.module';
     RequestModule,
     TourismModule,
     CollectedVehicleModule,
-    AppointmentModule,
     BusModule,
     DisasterPointModule,
+    AppointmentModule,
   ],
   controllers: [AppController],
   providers: [

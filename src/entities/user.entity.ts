@@ -14,6 +14,7 @@ import { Role } from '../auth/enums/role.enums';
 import { Department } from './department.entity';
 import { Request } from './request.entity';
 import { Appointment } from './appointment.entity';
+import { Report } from './report.entity';
 
 @Entity({ name: 'USER' })
 export class User {
@@ -49,7 +50,7 @@ export class User {
   @OneToOne(() => Department, (department) => department.responsible)
   department: Department;
 
-  // Relationshipe with REQUEST
+  // Relationship with REQUEST
   @OneToMany(() => Request, (request) => request.user)
   requests: Request[];
 
@@ -63,4 +64,8 @@ export class User {
   // relationship with appointemnt
   @OneToMany(() => Appointment, (appointment) => appointment.user)
   userAppointments: Appointment[];
+
+  // Relationship with REPORT
+  @OneToMany(() => Report, (report) => report.user)
+  reports: Report[];
 }

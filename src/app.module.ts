@@ -18,6 +18,7 @@ import { CollectedVehicleModule } from './collected-vehicle/collected-vehicle.mo
 import { BusModule } from './bus/bus.module';
 import { DisasterPointModule } from './disaster-point/disaster-point.module';
 import { AppointmentModule } from './appointment/appointment.module';
+import { ReportModule } from './report/report.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { AppointmentModule } from './appointment/appointment.module';
     BusModule,
     DisasterPointModule,
     AppointmentModule,
+    ReportModule,
   ],
   controllers: [AppController],
   providers: [

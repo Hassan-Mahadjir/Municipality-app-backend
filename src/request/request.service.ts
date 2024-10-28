@@ -57,15 +57,55 @@ export class RequestService {
     return user;
   }
 
-  findOne(id: number) {
-    return;
+  async findOne(id: number) {
+    const requestInfo = await this.RequestRepo.findOne({
+      where: { id: id },
+      relations: ['user', 'department', 'user.profile'],
+    });
+
+    if (!requestInfo)
+      throw new NotFoundException(
+        `The request with #ID: ${id} does not exist.`,
+      );
+    return requestInfo;
   }
 
-  update(id: number, updateRequestDto: UpdateRequestDto) {
-    return `This action updates a #${id} request`;
+  async update(id: number, updateRequestDto: UpdateRequestDto) {
+    const updatedRequest = await this.RequestRepo.update(
+      { id: id },
+      updateRequestDto,
+    );
+    return { message: `The request with #ID: ${id} has been updated.` };
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} request`;
+  async remove(id: number) {
+    // Find the request by ID and include its relations
+    const request = await this.RequestRepo.findOne({
+      where: { id },
+      relations: ['user', 'department'],
+    });
+
+    // If the request does not exist, throw an error
+    if (!request) {
+      throw new NotFoundException(`The request with ID #${id} does not exist.`);
+    }
+
+    // Remove associations if needed
+    if (request.user) {
+      request.user = null;
+    }
+    if (request.department) {
+      request.department = null;
+    }
+
+    // Save changes to clear associations
+    await this.RequestRepo.save(request);
+
+    // Now remove the request from the database
+    await this.RequestRepo.remove(request);
+
+    return {
+      message: `The request with ID #${id} has been successfully removed.`,
+    };
   }
 }

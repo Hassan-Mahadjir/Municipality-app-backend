@@ -15,6 +15,7 @@ import { DisasterPoint } from './disaster-point.entity';
 import { Availability } from './availability.entity';
 import { Request } from './request.entity';
 import { Report } from './report.entity';
+import { Restaurant } from './restaurant.entity';
 
 @Entity({ name: 'DEPARTMENT' })
 export class Department {
@@ -69,4 +70,7 @@ export class Department {
   // Relationship with REPORT
   @OneToMany(() => Report, (report) => report.department)
   reports: Report[];
+
+  @OneToMany(() => Restaurant, (restaurant) => restaurant.department)
+  restaurants: Restaurant[];
 }

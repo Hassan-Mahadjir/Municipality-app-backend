@@ -12,13 +12,14 @@ import dbConfig from './config/db.config';
 import dbConfigProduction from './config/db.config.production';
 import { APP_PIPE } from '@nestjs/core';
 import { RequestModule } from './request/request.module';
-import { TourismModule } from './tourism/tourism.module';
 import { HealthModule } from './health/health.module';
 import { CollectedVehicleModule } from './collected-vehicle/collected-vehicle.module';
 import { BusModule } from './bus/bus.module';
 import { DisasterPointModule } from './disaster-point/disaster-point.module';
 import { AppointmentModule } from './appointment/appointment.module';
 import { ReportModule } from './report/report.module';
+import { ImageModule } from './image/image.module';
+import { TourismModule } from './tourism/tourism.module';
 
 @Module({
   imports: [
@@ -38,12 +39,13 @@ import { ReportModule } from './report/report.module';
     HealthModule,
     DepartmentModule,
     RequestModule,
-    TourismModule,
     CollectedVehicleModule,
     BusModule,
     DisasterPointModule,
     AppointmentModule,
     ReportModule,
+    ImageModule,
+    TourismModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,31 +1,50 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
+import { Department } from './department.entity';
+import { Image } from './image.entity';
 
 @Entity({ name: 'RESTAURANT' })
 export class Restaurant {
-  @PrimaryGeneratedColumn('increment')
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   name: string;
 
   @Column({ type: 'boolean' })
-  weekdays: boolean;
+  open: boolean;
 
-  @Column({ type: 'boolean' })
-  weekends: boolean;
+  @Column()
+  location: string;
 
   @Column()
   phone: string;
 
   @Column()
-  openWeekdays: string;
+  openingHrWeekday: string;
 
   @Column()
-  closeWeekdays: string;
+  openingHrWeekend: string;
 
   @Column()
-  openWeekends: string;
+  closingHrWeekday: string;
 
   @Column()
-  closeWeekends: string;
+  closingHrWeekend: string;
+
+  // Relationship with DEPARTMENT
+  @ManyToOne(() => Department, (department) => department.restaurants)
+  @JoinColumn({ name: 'departmentId' })
+  department: Department;
+
+  // Relationship with IMAGE
+  @OneToMany(() => Image, (image) => image.retaurant)
+  @JoinColumn({ name: 'restaurantId' })
+  images: Image[];
 }

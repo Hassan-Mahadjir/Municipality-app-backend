@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Restaurant } from './restaurant.entity';
 
 @Entity({ name: 'IMAGE' })
 export class Image {
@@ -7,4 +8,8 @@ export class Image {
 
   @Column()
   imageUrl: string;
+
+  // Relationship with RESTAURANT
+  @ManyToOne(() => Restaurant, (restaurant) => restaurant.images)
+  retaurant: Restaurant;
 }

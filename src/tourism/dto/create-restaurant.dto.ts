@@ -1,12 +1,39 @@
+import {
+  IsArray,
+  IsBoolean,
+  IsPhoneNumber,
+  IsString,
+  IsUrl,
+} from 'class-validator';
+
 export class CreateRestaurantDto {
-    id: number;
-    name: string;
-    weekdays: boolean;
-    weekends: boolean;
-    phone: string;
-    openWeekdays: string;
-    closeWeekdays: string;
-    openWeekends: string;
-    closeWeekends: string;
-  }
-  
+  @IsString()
+  name: string;
+
+  @IsBoolean()
+  open: boolean;
+
+  @IsPhoneNumber()
+  phone: string;
+
+  @IsString()
+  location: string;
+
+  @IsString()
+  openingHrWeekday: string;
+
+  @IsString()
+  openingHrWeekend: string;
+
+  @IsString()
+  closingHrWeekday: string;
+
+  @IsString()
+  closingHrWeekend: string;
+
+  @IsString()
+  departmentName: string;
+
+  @IsArray()
+  imageUrls: string[];
+}

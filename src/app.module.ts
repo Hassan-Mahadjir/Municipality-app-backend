@@ -20,6 +20,7 @@ import { AppointmentModule } from './appointment/appointment.module';
 import { ReportModule } from './report/report.module';
 import { ImageModule } from './image/image.module';
 import { TourismModule } from './tourism/tourism.module';
+import { AnnoucementModule } from './annoucement/annoucement.module';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { TourismModule } from './tourism/tourism.module';
     ReportModule,
     ImageModule,
     TourismModule,
+    AnnoucementModule,
   ],
   controllers: [AppController],
   providers: [

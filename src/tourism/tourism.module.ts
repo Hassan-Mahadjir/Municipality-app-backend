@@ -11,10 +11,18 @@ import { DepartmentService } from 'src/department/department.service';
 import { ImageService } from 'src/image/image.service';
 import { UserService } from 'src/user/user.service';
 import { ProfileService } from 'src/profile/profile.service';
+import { HistoricalPlace } from 'src/entities/historical-place.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Restaurant, Image, User, Department, Profile]),
+    TypeOrmModule.forFeature([
+      Restaurant,
+      Image,
+      User,
+      Department,
+      Profile,
+      HistoricalPlace,
+    ]),
   ],
   controllers: [TourismController],
   providers: [

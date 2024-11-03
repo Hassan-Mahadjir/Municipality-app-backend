@@ -1,6 +1,15 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
+import { Department } from './department.entity';
+import { Image } from './image.entity';
 
-@Entity({ name: 'HISTORICAL PLACES' })
+@Entity({ name: 'HISTORICAL PLACE' })
 export class HistoricalPlace {
   @PrimaryGeneratedColumn()
   id: number;
@@ -9,23 +18,33 @@ export class HistoricalPlace {
   name: string;
 
   @Column({ default: false })
-  weekends: boolean;
+  open: boolean;
 
-  @Column({ default: false })
-  weekdays: boolean;
+  @Column()
+  location: string;
 
   @Column()
   history: string;
 
   @Column()
-  openWeekdays: string;
+  openingHrWeekday: string;
 
   @Column()
-  closeWeekdays: string;
+  openingHrWeekend: string;
 
   @Column()
-  openWeekends: string;
+  closingHrWeekday: string;
 
   @Column()
-  closeWeekends: string;
+  closingHrWeekend: string;
+
+  // Relationship with DEPARTMENT
+  @ManyToOne(() => Department, (department) => department.historicalPlaces)
+  @JoinColumn({ name: 'departmnetId' })
+  department: Department;
+
+  // Relationship with IMAGE
+  @OneToMany(() => Image, (image) => image.historicalPlace)
+  @JoinColumn({ name: 'historicalPlaceId' })
+  images: Image[];
 }

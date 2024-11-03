@@ -16,6 +16,7 @@ import { Availability } from './availability.entity';
 import { Request } from './request.entity';
 import { Report } from './report.entity';
 import { Restaurant } from './restaurant.entity';
+import { HistoricalPlace } from './historical-place.entity';
 
 @Entity({ name: 'DEPARTMENT' })
 export class Department {
@@ -71,6 +72,11 @@ export class Department {
   @OneToMany(() => Report, (report) => report.department)
   reports: Report[];
 
+  // Relationship with RESTAURANT
   @OneToMany(() => Restaurant, (restaurant) => restaurant.department)
   restaurants: Restaurant[];
+
+  // Relationship with HISTORICAL-PLACE
+  @OneToMany(() => HistoricalPlace, (place) => place.department)
+  historicalPlaces: HistoricalPlace[];
 }

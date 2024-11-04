@@ -21,6 +21,7 @@ import { ReportModule } from './report/report.module';
 import { ImageModule } from './image/image.module';
 import { TourismModule } from './tourism/tourism.module';
 import { AnnoucementModule } from './annoucement/annoucement.module';
+import { CommunityModule } from './community/community.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { AnnoucementModule } from './annoucement/annoucement.module';
     ImageModule,
     TourismModule,
     AnnoucementModule,
+    CommunityModule,
   ],
   controllers: [AppController],
   providers: [

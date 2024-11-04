@@ -18,6 +18,7 @@ import { Report } from './report.entity';
 import { Restaurant } from './restaurant.entity';
 import { HistoricalPlace } from './historical-place.entity';
 import { Announcement } from './annoucemnet.entity';
+import { EmergencyContact } from './emergency-contact.entity';
 
 @Entity({ name: 'DEPARTMENT' })
 export class Department {
@@ -84,4 +85,11 @@ export class Department {
   // Relationship with ANNOUNCEMNET
   @OneToMany(() => Announcement, (announcement) => announcement.department)
   annoucenments: Announcement[];
+
+  // Relationship with EMERGENCY
+  @OneToMany(
+    () => EmergencyContact,
+    (emergencyContact) => emergencyContact.department,
+  )
+  emergencyContacts: EmergencyContact[];
 }

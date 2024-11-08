@@ -10,6 +10,10 @@ import {
 import { CommunityService } from './community.service';
 import { CreateEmergencyContactDto } from './dto/create-emergency-contact.dto';
 import { UpdateEmergencyContactDto } from './dto/update-emergency-contact.dto';
+import { UpdateWasteSechduleDto } from './dto/update-waste-sechdule.dto';
+import { CreateWasteTypeDto } from './dto/create-waste-type.dto';
+import { UpdateWasteTypeDto } from './dto/update-waste-type.dto';
+import { CreateWasteSechduleDto } from './dto/create-waste-sechdule.dto';
 
 @Controller('community')
 export class CommunityController {
@@ -46,5 +50,36 @@ export class CommunityController {
   @Delete('emergency-contact/:id')
   remove(@Param('id') id: string) {
     return this.communityService.removeEmergencyContact(+id);
+  }
+
+  @Post('waste-type')
+  createWasteType(@Body() createWasteTypeDto: CreateWasteTypeDto) {
+    return this.communityService.createWasteType(createWasteTypeDto);
+  }
+
+  @Patch('waste-type/:id')
+  updateWasteType(
+    @Body() updateWasteTypeDto: UpdateWasteTypeDto,
+    @Param('id') id: string,
+  ) {
+    return this.communityService.modifyWasteType(+id, updateWasteTypeDto);
+  }
+
+  @Post('waste-sechdule')
+  createWasteSechdule(@Body() createWasteSechduleDto: CreateWasteSechduleDto) {
+    return this.communityService.createWasteSechdule(createWasteSechduleDto);
+  }
+
+  @Patch('waste-sechdule/:id')
+  updateWasteSechdule(
+    @Body() updateWasteSechdule: UpdateWasteSechduleDto,
+    @Param('id') id: string,
+  ) {
+    return this.communityService.updateWasteSechdule(+id, updateWasteSechdule);
+  }
+
+  @Delete('waste-type/:id')
+  deleteWaste(@Param('id') id: string) {
+    return this.communityService.deleteWasteType(+id);
   }
 }

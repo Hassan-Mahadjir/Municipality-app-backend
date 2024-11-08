@@ -11,6 +11,8 @@ import { DepartmentService } from 'src/department/department.service';
 import { ImageService } from 'src/image/image.service';
 import { UserService } from 'src/user/user.service';
 import { ProfileService } from 'src/profile/profile.service';
+import { WasteSechdule } from 'src/entities/waste-sechdule.entity';
+import { WasteType } from 'src/entities/waste-type.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -19,6 +21,8 @@ import { ProfileService } from 'src/profile/profile.service';
       User,
       Department,
       Profile,
+      WasteSechdule,
+      WasteType,
     ]),
   ],
   controllers: [CommunityController],

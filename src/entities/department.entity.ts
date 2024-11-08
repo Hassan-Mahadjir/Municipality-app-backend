@@ -19,6 +19,7 @@ import { Restaurant } from './restaurant.entity';
 import { HistoricalPlace } from './historical-place.entity';
 import { Announcement } from './annoucemnet.entity';
 import { EmergencyContact } from './emergency-contact.entity';
+import { WasteType } from './waste-type.entity';
 
 @Entity({ name: 'DEPARTMENT' })
 export class Department {
@@ -92,4 +93,8 @@ export class Department {
     (emergencyContact) => emergencyContact.department,
   )
   emergencyContacts: EmergencyContact[];
+
+  // Relationship with WASTE TYPE
+  @OneToMany(() => WasteType, (wasteType) => wasteType.department)
+  wasteTypes: WasteType[];
 }

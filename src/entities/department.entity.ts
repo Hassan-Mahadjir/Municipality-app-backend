@@ -20,6 +20,7 @@ import { HistoricalPlace } from './historical-place.entity';
 import { Announcement } from './annoucemnet.entity';
 import { EmergencyContact } from './emergency-contact.entity';
 import { WasteType } from './waste-type.entity';
+import { Animal } from './animal.entity';
 
 @Entity({ name: 'DEPARTMENT' })
 export class Department {
@@ -97,4 +98,8 @@ export class Department {
   // Relationship with WASTE TYPE
   @OneToMany(() => WasteType, (wasteType) => wasteType.department)
   wasteTypes: WasteType[];
+
+  // Relationship with ANIMAL
+  @OneToMany(() => Animal, (animal) => animal.department)
+  animals: Animal[];
 }

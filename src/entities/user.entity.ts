@@ -15,6 +15,7 @@ import { Department } from './department.entity';
 import { Request } from './request.entity';
 import { Appointment } from './appointment.entity';
 import { Report } from './report.entity';
+import { Animal } from './animal.entity';
 
 @Entity({ name: 'USER' })
 export class User {
@@ -68,4 +69,8 @@ export class User {
   // Relationship with REPORT
   @OneToMany(() => Report, (report) => report.user)
   reports: Report[];
+
+  // Relationship with ANIMAL
+  @OneToMany(() => Animal, (animal) => animal.user)
+  userAnimals: Animal[];
 }

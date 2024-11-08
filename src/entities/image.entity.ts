@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { Restaurant } from './restaurant.entity';
 import { HistoricalPlace } from './historical-place.entity';
 import { Announcement } from './annoucemnet.entity';
+import { Animal } from './animal.entity';
 
 @Entity({ name: 'IMAGE' })
 export class Image {
@@ -22,4 +23,8 @@ export class Image {
   // Relationship with ANNOUCEMENT
   @ManyToOne(() => Announcement, (annoucemnet) => annoucemnet.images)
   announcemnet: Announcement;
+
+  // Relationship with ANIMAL
+  @ManyToOne(() => Animal, (animal) => animal.images)
+  animal: Animal;
 }

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -19,6 +20,11 @@ import { WasteSechdule } from 'src/entities/waste-sechdule.entity';
 import { CreateWasteTypeDto } from './dto/create-waste-type.dto';
 import { UpdateWasteTypeDto } from './dto/update-waste-type.dto';
 import { CreateWasteSechduleDto } from './dto/create-waste-sechdule.dto';
+import { Animal } from 'src/entities/animal.entity';
+import { User } from 'src/entities/user.entity';
+import { CreateAnimalDto } from './dto/create-animal.dto';
+import { UpdateAnimalDto } from './dto/update-animal.dto';
+import { Image } from 'src/entities/image.entity';
 
 @Injectable()
 export class CommunityService {
@@ -30,6 +36,8 @@ export class CommunityService {
     @InjectRepository(WasteType) private wasteTypeRepo: Repository<WasteType>,
     @InjectRepository(WasteSechdule)
     private wasteSechduleRepo: Repository<WasteSechdule>,
+    @InjectRepository(Animal) private animalRepo: Repository<Animal>,
+    @InjectRepository(User) private userRepo: Repository<User>,
   ) {}
   async createEmergencyContact(
     createEmergencyContactDto: CreateEmergencyContactDto,
@@ -256,6 +264,156 @@ export class CommunityService {
 
     return {
       message: `The Waste type with ID: ${id} and its associations have been deleted successfully.`,
+    };
+  }
+
+  // ANIMAL SERVICE
+  async CreateAnimalReport(id: number, createAnimalDto: CreateAnimalDto) {
+    // Find the department
+    const department =
+      await this.departmentService.findDepartmentbyName('Community');
+    if (!department) {
+      throw new NotFoundException(`The department 'Community' does not exist.`);
+    }
+
+    // Find the user
+    const user = await this.userRepo.findOne({ where: { id: id } });
+    if (!user) {
+      throw new NotFoundException(`The user with ID: ${id} does not exist.`);
+    }
+
+    // Initialize an array to store image entities
+    const images: Image[] = [];
+
+    // Iterate over image URLs and create each image
+    for (const imageUrl of createAnimalDto.imageUrls) {
+      const image = await this.imageService.create(imageUrl);
+      if (image) {
+        images.push(image);
+      }
+    }
+
+    // Create the new animal report with associated images
+    const newReport = this.animalRepo.create({
+      title: createAnimalDto.title,
+      status: createAnimalDto.status,
+      description: createAnimalDto.description,
+      contactInfo: createAnimalDto.contactInfo,
+      location: createAnimalDto.location,
+      department: department,
+      user: user,
+      images: images, // Associate the images with the report
+    });
+
+    return await this.animalRepo.save(newReport);
+  }
+
+  async findAinmalReport(id: number) {
+    const animalReport = await this.animalRepo.findOne({
+      where: { id: id },
+      relations: ['department', 'user.profile', 'images'],
+    });
+
+    if (!animalReport)
+      throw new NotFoundException(`The Animal with ${id} does not exist.`);
+
+    return animalReport;
+  }
+
+  async findAllAnimalReport() {
+    return await this.animalRepo.find({
+      relations: ['department', 'user.profile', 'images'],
+    });
+  }
+
+  async updateAnimalReport(id: number, updateAnimalDto: UpdateAnimalDto) {
+    const animalReport = await this.animalRepo.findOne({
+      where: { id: id },
+      relations: ['department', 'user.profile', 'images'],
+    });
+
+    if (!animalReport) {
+      throw new NotFoundException(
+        `The Animal report with ID: ${id} does not exist.`,
+      );
+    }
+
+    const user = await this.userRepo.findOne({
+      where: { id: updateAnimalDto.userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException(
+        `The user with ID: ${updateAnimalDto.userId} does not exist.`,
+      );
+    }
+
+    // Optional: Check if the animal report is associated with the current user
+    // if (animalReport.user.id !== updateAnimalDto.userId) {
+    //   throw new ForbiddenException(
+    //     `You do not have permission to update this animal report.`,
+    //   );
+    // }
+
+    // Remove old images if new images are provided
+    if (updateAnimalDto.imageUrls) {
+      // Check if there are existing images before attempting to delete
+      if (animalReport.images && animalReport.images.length > 0) {
+        const oldImageIds = animalReport.images.map((image) => image.id);
+        await this.imageService.deleteImages(oldImageIds);
+      }
+
+      // Add new images
+      const newImages = [];
+      for (const imageUrl of updateAnimalDto.imageUrls) {
+        const image = await this.imageService.create(imageUrl);
+        if (image) {
+          newImages.push(image);
+        }
+      }
+      animalReport.images = newImages;
+    }
+
+    // Merge updateAnimalDto properties into the existing animalReport object
+    Object.assign(animalReport, updateAnimalDto);
+
+    // Save the updated animalReport entity with new images
+    await this.animalRepo.save(animalReport);
+
+    return {
+      message: `The Animal report with ID: ${id} has been updated successfully, including images.`,
+    };
+  }
+
+  async deleteAnimalReport(id: number) {
+    const animalReport = await this.animalRepo.findOne({
+      where: { id: id },
+      relations: ['department', 'user.profile', 'images'], // Include images in relations
+    });
+
+    if (!animalReport) {
+      throw new NotFoundException(
+        `The Animal report with ID: ${id} does not exist.`,
+      );
+    }
+
+    // Delete associated images if they exist
+    if (animalReport.images && animalReport.images.length > 0) {
+      const imageIds = animalReport.images.map((image) => image.id);
+      await this.imageService.deleteImages(imageIds);
+    }
+
+    // Remove the association with department and user by setting them to null
+    await this.animalRepo.update(id, {
+      department: null,
+      user: null,
+    });
+
+    // Now delete the animal report itself
+    await this.animalRepo.delete(id);
+
+    return {
+      message: `The Animal report with ID: ${id} and its associated images have been deleted successfully.`,
     };
   }
 }

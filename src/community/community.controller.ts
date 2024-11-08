@@ -14,6 +14,8 @@ import { UpdateWasteSechduleDto } from './dto/update-waste-sechdule.dto';
 import { CreateWasteTypeDto } from './dto/create-waste-type.dto';
 import { UpdateWasteTypeDto } from './dto/update-waste-type.dto';
 import { CreateWasteSechduleDto } from './dto/create-waste-sechdule.dto';
+import { CreateAnimalDto } from './dto/create-animal.dto';
+import { UpdateAnimalDto } from './dto/update-animal.dto';
 
 @Controller('community')
 export class CommunityController {
@@ -81,5 +83,36 @@ export class CommunityController {
   @Delete('waste-type/:id')
   deleteWaste(@Param('id') id: string) {
     return this.communityService.deleteWasteType(+id);
+  }
+
+  @Post('animal-report/:id')
+  createAnimalReport(
+    @Param('id') id: string,
+    @Body() createAnimalReportDto: CreateAnimalDto,
+  ) {
+    return this.communityService.CreateAnimalReport(+id, createAnimalReportDto);
+  }
+
+  @Get('animal-report/:id')
+  findAnimalReport(@Param('id') id: string) {
+    return this.communityService.findAinmalReport(+id);
+  }
+
+  @Get('animal-report')
+  findAllAnimalReport() {
+    return this.communityService.findAllAnimalReport();
+  }
+
+  @Patch('animal-report/:id')
+  updateAnimalReport(
+    @Body() updateAnimalDto: UpdateAnimalDto,
+    @Param('id') id: string,
+  ) {
+    return this.communityService.updateAnimalReport(+id, updateAnimalDto);
+  }
+
+  @Delete('animal-report/:id')
+  deleteAnimalREport(@Param('id') id: string) {
+    return this.communityService.deleteAnimalReport(+id);
   }
 }

@@ -15,7 +15,6 @@ import { RequestModule } from './request/request.module';
 import { HealthModule } from './health/health.module';
 import { CollectedVehicleModule } from './collected-vehicle/collected-vehicle.module';
 import { BusModule } from './bus/bus.module';
-import { DisasterPointModule } from './disaster-point/disaster-point.module';
 import { AppointmentModule } from './appointment/appointment.module';
 import { ReportModule } from './report/report.module';
 import { ImageModule } from './image/image.module';
@@ -43,7 +42,6 @@ import { CommunityModule } from './community/community.module';
     RequestModule,
     CollectedVehicleModule,
     BusModule,
-    DisasterPointModule,
     AppointmentModule,
     ReportModule,
     ImageModule,

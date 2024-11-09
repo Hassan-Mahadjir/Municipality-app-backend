@@ -15,6 +15,7 @@ import { WasteSechdule } from 'src/entities/waste-sechdule.entity';
 import { WasteType } from 'src/entities/waste-type.entity';
 import { Animal } from 'src/entities/animal.entity';
 import { AnimalShelter } from 'src/entities/shelter.entity';
+import { DisasterPoint } from 'src/entities/disaster-point.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -27,6 +28,7 @@ import { AnimalShelter } from 'src/entities/shelter.entity';
       WasteType,
       Animal,
       AnimalShelter,
+      DisasterPoint,
     ]),
   ],
   controllers: [CommunityController],

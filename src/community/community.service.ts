@@ -29,6 +29,9 @@ import { Image } from 'src/entities/image.entity';
 import { AnimalShelter } from 'src/entities/shelter.entity';
 import { CreateAnimalShelterDto } from './dto/create-animal-shelter.dto';
 import { UpdateAnimalShelterDto } from './dto/update-animal-shelter.dto';
+import { CreateDisasterPointDto } from './dto/create-disaster-point.dto';
+import { DisasterPoint } from 'src/entities/disaster-point.entity';
+import { UpdateDisasterPointDto } from './dto/update-disaster-point.dto';
 
 @Injectable()
 export class CommunityService {
@@ -44,6 +47,8 @@ export class CommunityService {
     @InjectRepository(User) private userRepo: Repository<User>,
     @InjectRepository(AnimalShelter)
     private animalShelterRepo: Repository<AnimalShelter>,
+    @InjectRepository(DisasterPoint)
+    private disasterPointRepo: Repository<DisasterPoint>,
   ) {}
   async createEmergencyContact(
     createEmergencyContactDto: CreateEmergencyContactDto,
@@ -476,5 +481,59 @@ export class CommunityService {
     return {
       message: `The shelter with ID: ${id} has been delete successfuly.`,
     };
+  }
+
+  async createDisasterPoint(createDisasterPointDto: CreateDisasterPointDto) {
+    const department = await this.departmentService.findDepartmentbyName(
+      createDisasterPointDto.departmentName,
+    );
+    if (!department)
+      throw new NotFoundException(
+        `The department with ${createDisasterPointDto.departmentName} does not exist.`,
+      );
+
+    if (
+      createDisasterPointDto.departmentName.toLocaleLowerCase() != 'community'
+    )
+      throw new UnauthorizedException(
+        'The service is not allowed to be assigned here',
+      );
+
+    const newDisasterPoint = await this.disasterPointRepo.create({
+      ...createDisasterPointDto,
+      department: department,
+    });
+
+    return await this.disasterPointRepo.save(newDisasterPoint);
+  }
+
+  async findAllDisasterPoints() {
+    return await this.disasterPointRepo.find();
+  }
+
+  async findDisasterPoint(id: number) {
+    const point = await this.disasterPointRepo.findOne({ where: { id: id } });
+    if (!point)
+      throw new NotFoundException(
+        `The Disaster point with ID: ${id} does not exist.`,
+      );
+    return point;
+  }
+
+  async updateDisasterPoint(
+    id: number,
+    updateDisasterPointDto: UpdateDisasterPointDto,
+  ) {
+    const point = await this.disasterPointRepo.findOne({ where: { id: id } });
+    if (!point)
+      throw new NotFoundException(
+        `The Disaster point with ID: ${id} does not exist.`,
+      );
+
+    return await this.disasterPointRepo.update({ id }, updateDisasterPointDto);
+  }
+
+  async removeDisasterPoint(id: number) {
+    return await this.disasterPointRepo.delete(id);
   }
 }

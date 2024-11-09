@@ -18,6 +18,8 @@ import { CreateAnimalDto } from './dto/create-animal.dto';
 import { UpdateAnimalDto } from './dto/update-animal.dto';
 import { CreateAnimalShelterDto } from './dto/create-animal-shelter.dto';
 import { UpdateAnimalShelterDto } from './dto/update-animal-shelter.dto';
+import { CreateDisasterPointDto } from './dto/create-disaster-point.dto';
+import { UpdateDisasterPointDto } from './dto/update-disaster-point.dto';
 
 @Controller('community')
 export class CommunityController {
@@ -143,5 +145,36 @@ export class CommunityController {
   @Delete('animal-shelter/:id')
   deleteAnimalShelter(@Param('id') id: string) {
     return this.communityService.deleteAnimalShelter(+id);
+  }
+
+  @Post('disaster-point')
+  createDisasterPoint(@Body() createDisasterPointDto: CreateDisasterPointDto) {
+    return this.communityService.createDisasterPoint(createDisasterPointDto);
+  }
+
+  @Get('disaster-point')
+  findAllDisasterPoints() {
+    return this.communityService.findAllDisasterPoints();
+  }
+
+  @Get('disaster-point/:id')
+  findDisasterPoint(@Param('id') id: string) {
+    return this.communityService.findDisasterPoint(+id);
+  }
+
+  @Patch('disaster-point/:id')
+  updateDisasterPoint(
+    @Param('id') id: string,
+    @Body() updateDisasterPointDto: UpdateDisasterPointDto,
+  ) {
+    return this.communityService.updateDisasterPoint(
+      +id,
+      updateDisasterPointDto,
+    );
+  }
+
+  @Delete('disaster-point/:id')
+  removeDisasterPoint(@Param('id') id: string) {
+    return this.communityService.removeDisasterPoint(+id);
   }
 }

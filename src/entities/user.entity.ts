@@ -16,6 +16,7 @@ import { Request } from './request.entity';
 import { Appointment } from './appointment.entity';
 import { Report } from './report.entity';
 import { Animal } from './animal.entity';
+import { Comment } from './comment.entity';
 
 @Entity({ name: 'USER' })
 export class User {
@@ -73,4 +74,8 @@ export class User {
   // Relationship with ANIMAL
   @OneToMany(() => Animal, (animal) => animal.user)
   userAnimals: Animal[];
+
+  // Relationship with COMMENT
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[];
 }

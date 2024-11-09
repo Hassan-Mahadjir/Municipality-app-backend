@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Department } from './department.entity';
 import { Image } from './image.entity';
+import { Comment } from './comment.entity';
 
 @Entity({ name: 'HISTORICAL PLACE' })
 export class HistoricalPlace {
@@ -47,4 +48,8 @@ export class HistoricalPlace {
   @OneToMany(() => Image, (image) => image.historicalPlace)
   @JoinColumn({ name: 'historicalPlaceId' })
   images: Image[];
+
+  // Relationship with COMMENT
+  @OneToMany(() => Comment, (comment) => comment.historicalPlace)
+  historicalPlaceComments: Comment[];
 }

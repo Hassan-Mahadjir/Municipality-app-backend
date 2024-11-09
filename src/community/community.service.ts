@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  Param,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateEmergencyContactDto } from './dto/create-emergency-contact.dto';
@@ -25,6 +26,9 @@ import { User } from 'src/entities/user.entity';
 import { CreateAnimalDto } from './dto/create-animal.dto';
 import { UpdateAnimalDto } from './dto/update-animal.dto';
 import { Image } from 'src/entities/image.entity';
+import { AnimalShelter } from 'src/entities/shelter.entity';
+import { CreateAnimalShelterDto } from './dto/create-animal-shelter.dto';
+import { UpdateAnimalShelterDto } from './dto/update-animal-shelter.dto';
 
 @Injectable()
 export class CommunityService {
@@ -38,6 +42,8 @@ export class CommunityService {
     private wasteSechduleRepo: Repository<WasteSechdule>,
     @InjectRepository(Animal) private animalRepo: Repository<Animal>,
     @InjectRepository(User) private userRepo: Repository<User>,
+    @InjectRepository(AnimalShelter)
+    private animalShelterRepo: Repository<AnimalShelter>,
   ) {}
   async createEmergencyContact(
     createEmergencyContactDto: CreateEmergencyContactDto,
@@ -349,11 +355,11 @@ export class CommunityService {
     }
 
     // Optional: Check if the animal report is associated with the current user
-    // if (animalReport.user.id !== updateAnimalDto.userId) {
-    //   throw new ForbiddenException(
-    //     `You do not have permission to update this animal report.`,
-    //   );
-    // }
+    if (animalReport.user.id !== updateAnimalDto.userId) {
+      throw new ForbiddenException(
+        `You do not have permission to update this animal report.`,
+      );
+    }
 
     // Remove old images if new images are provided
     if (updateAnimalDto.imageUrls) {
@@ -414,6 +420,61 @@ export class CommunityService {
 
     return {
       message: `The Animal report with ID: ${id} and its associated images have been deleted successfully.`,
+    };
+  }
+
+  async createAnimalShelter(createAnimalShelterDto: CreateAnimalShelterDto) {
+    const department = await this.departmentService.findDepartmentbyName(
+      createAnimalShelterDto.departmentName,
+    );
+    if (!department)
+      throw new NotFoundException(
+        `The department ${createAnimalShelterDto.departmentName} does not exist.`,
+      );
+
+    if (department.name.toLocaleLowerCase() != 'community')
+      throw new UnauthorizedException(
+        `The service is not allowed to assign here.`,
+      );
+
+    const newShelter = await this.animalShelterRepo.create({
+      ...createAnimalShelterDto,
+      department: department,
+    });
+
+    return this.animalShelterRepo.save(newShelter);
+  }
+
+  async findAllAnimalShelters() {
+    return await this.animalShelterRepo.find({ relations: ['department'] });
+  }
+
+  async findAnimalShelter(id: number) {
+    return await this.animalShelterRepo.findOne({
+      where: { id: id },
+      relations: ['department'],
+    });
+  }
+
+  async updateAnimalShelter(
+    id: number,
+    updateAnimalShelter: UpdateAnimalShelterDto,
+  ) {
+    const animalShelter = await this.animalShelterRepo.findOne({
+      where: { id: id },
+    });
+
+    if (!animalShelter)
+      throw new NotFoundException(`The shelter with ID:${id} does not exist.`);
+
+    return this.animalShelterRepo.update({ id }, updateAnimalShelter);
+  }
+
+  async deleteAnimalShelter(id: number) {
+    await this.animalShelterRepo.delete(id);
+
+    return {
+      message: `The shelter with ID: ${id} has been delete successfuly.`,
     };
   }
 }

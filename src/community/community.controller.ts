@@ -16,6 +16,8 @@ import { UpdateWasteTypeDto } from './dto/update-waste-type.dto';
 import { CreateWasteSechduleDto } from './dto/create-waste-sechdule.dto';
 import { CreateAnimalDto } from './dto/create-animal.dto';
 import { UpdateAnimalDto } from './dto/update-animal.dto';
+import { CreateAnimalShelterDto } from './dto/create-animal-shelter.dto';
+import { UpdateAnimalShelterDto } from './dto/update-animal-shelter.dto';
 
 @Controller('community')
 export class CommunityController {
@@ -112,7 +114,34 @@ export class CommunityController {
   }
 
   @Delete('animal-report/:id')
-  deleteAnimalREport(@Param('id') id: string) {
+  deleteAnimalReport(@Param('id') id: string) {
     return this.communityService.deleteAnimalReport(+id);
+  }
+
+  @Post('animal-shelter')
+  createAnimalShelter(@Body() createAnimalShelterDto: CreateAnimalShelterDto) {
+    return this.communityService.createAnimalShelter(createAnimalShelterDto);
+  }
+  @Get('animal-shelter/:id')
+  findAnimalShelter(@Param('id') id: string) {
+    return this.communityService.findAnimalShelter(+id);
+  }
+
+  @Get('animal-shelter')
+  findAllAnimalShelters() {
+    return this.communityService.findAllAnimalShelters();
+  }
+
+  @Patch('animal-shelter/:id')
+  updateAnimalShelter(
+    @Param('id') id: string,
+    @Body() updateAimalShelter: UpdateAnimalShelterDto,
+  ) {
+    return this.communityService.updateAnimalShelter(+id, updateAimalShelter);
+  }
+
+  @Delete('animal-shelter/:id')
+  deleteAnimalShelter(@Param('id') id: string) {
+    return this.communityService.deleteAnimalShelter(+id);
   }
 }

@@ -14,6 +14,7 @@ import { ProfileService } from 'src/profile/profile.service';
 import { WasteSechdule } from 'src/entities/waste-sechdule.entity';
 import { WasteType } from 'src/entities/waste-type.entity';
 import { Animal } from 'src/entities/animal.entity';
+import { AnimalShelter } from 'src/entities/shelter.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -25,6 +26,7 @@ import { Animal } from 'src/entities/animal.entity';
       WasteSechdule,
       WasteType,
       Animal,
+      AnimalShelter,
     ]),
   ],
   controllers: [CommunityController],

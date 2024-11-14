@@ -22,6 +22,7 @@ import { EmergencyContact } from './emergency-contact.entity';
 import { WasteType } from './waste-type.entity';
 import { Animal } from './animal.entity';
 import { AnimalShelter } from './shelter.entity';
+import { Event } from './event.entity';
 
 @Entity({ name: 'DEPARTMENT' })
 export class Department {
@@ -107,4 +108,8 @@ export class Department {
   // Relationship with ANIMAL SHELTER
   @OneToMany(() => AnimalShelter, (shelter) => shelter.department)
   animalShelters: AnimalShelter[];
+
+  // Relatinship with EVENT
+  @OneToMany(() => Event, (event) => event.department)
+  events: Event[];
 }

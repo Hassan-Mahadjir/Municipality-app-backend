@@ -22,6 +22,7 @@ import { TourismModule } from './tourism/tourism.module';
 import { AnnoucementModule } from './annoucement/annoucement.module';
 import { CommunityModule } from './community/community.module';
 import { CommentModule } from './comment/comment.module';
+import { EventModule } from './event/event.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { CommentModule } from './comment/comment.module';
     AnnoucementModule,
     CommunityModule,
     CommentModule,
+    EventModule,
   ],
   controllers: [AppController],
   providers: [

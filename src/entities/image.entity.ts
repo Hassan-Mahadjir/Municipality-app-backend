@@ -3,6 +3,7 @@ import { Restaurant } from './restaurant.entity';
 import { HistoricalPlace } from './historical-place.entity';
 import { Announcement } from './annoucemnet.entity';
 import { Animal } from './animal.entity';
+import { Event } from './event.entity';
 
 @Entity({ name: 'IMAGE' })
 export class Image {
@@ -27,4 +28,8 @@ export class Image {
   // Relationship with ANIMAL
   @ManyToOne(() => Animal, (animal) => animal.images)
   animal: Animal;
+
+  // Relationship with EVENT
+  @ManyToOne(() => Event, (event) => event.images)
+  eventImage: Event;
 }

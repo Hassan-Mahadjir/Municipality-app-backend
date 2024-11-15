@@ -21,6 +21,9 @@ export class Announcement {
   @Column()
   body: string;
 
+  @Column({ nullable: true })
+  title: string;
+
   @CreateDateColumn()
   createAt: Date;
 

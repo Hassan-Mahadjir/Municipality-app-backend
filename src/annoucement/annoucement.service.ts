@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 import { DepartmentService } from 'src/department/department.service';
 import { ImageService } from 'src/image/image.service';
 import { Image } from 'src/entities/image.entity';
+import { PaginationDTO } from 'src/department/dto/pagination.dto';
+import { DEFAULT_PAGE_SIZE } from 'src/utils/constants';
 
 @Injectable()
 export class AnnoucementService {
@@ -45,15 +47,26 @@ export class AnnoucementService {
     return savedAnnoucement;
   }
 
-  async findAll() {
-    return await this.annoucementRepo.find({ relations: ['images'] });
+  async findAll(paginationDTO: PaginationDTO) {
+    const allAnnouncement = await this.annoucementRepo.find({
+      relations: ['images'],
+      skip: paginationDTO.skip,
+      take: paginationDTO.limit ?? 5,
+    });
+
+    const totalFetched = allAnnouncement.length;
+    const message = `Successfully fetched ${totalFetched} announcements.`;
+
+    return { message: message, data: allAnnouncement };
   }
 
   async findOne(id: number) {
-    return await this.annoucementRepo.findOne({
+    const annoucement = await this.annoucementRepo.findOne({
       where: { id: id },
       relations: ['images'],
     });
+    const message = `Successfully fetched announcement.`;
+    return { message: message, data: annoucement };
   }
 
   async update(id: number, updateAnnoucementDto: UpdateAnnoucementDto) {

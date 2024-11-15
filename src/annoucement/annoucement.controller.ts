@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { AnnoucementService } from './annoucement.service';
 import { CreateAnnoucementDto } from './dto/create-annoucement.dto';
 import { UpdateAnnoucementDto } from './dto/update-annoucement.dto';
+import { PaginationDTO } from 'src/department/dto/pagination.dto';
 
 @Controller('annoucement')
 export class AnnoucementController {
@@ -13,8 +23,8 @@ export class AnnoucementController {
   }
 
   @Get()
-  findAll() {
-    return this.annoucementService.findAll();
+  findAll(@Query() paginationDTO: PaginationDTO) {
+    return this.annoucementService.findAll(paginationDTO);
   }
 
   @Get(':id')
@@ -23,7 +33,10 @@ export class AnnoucementController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAnnoucementDto: UpdateAnnoucementDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateAnnoucementDto: UpdateAnnoucementDto,
+  ) {
     return this.annoucementService.update(+id, updateAnnoucementDto);
   }
 

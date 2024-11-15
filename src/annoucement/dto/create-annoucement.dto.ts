@@ -5,6 +5,9 @@ export class CreateAnnoucementDto {
   type: string;
 
   @IsString()
+  title: string;
+
+  @IsString()
   header: string;
 
   @IsString()

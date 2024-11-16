@@ -26,11 +26,6 @@ export class DepartmentService {
     const user = await this.userService.findOne(responsibleId);
     if (!user) throw new NotFoundException('User is not found');
 
-    if (user)
-      throw new UnauthorizedException(
-        'The user is already resposible for a department',
-      );
-
     if (user.role !== 'STAFF') {
       throw new UnauthorizedException(
         'User is not authorized to be resposible',

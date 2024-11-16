@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsString, IsUrl } from 'class-validator';
 
 export class CreateDepartmentDto {
   @IsString()
@@ -9,6 +9,9 @@ export class CreateDepartmentDto {
 
   @IsString()
   email: string;
+
+  @IsUrl()
+  imageUrl: string;
 
   @IsString()
   description?: string;

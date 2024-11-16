@@ -41,6 +41,9 @@ export class Department {
   @Column({ nullable: true })
   phone: string;
 
+  @Column({ nullable: true })
+  imageUrl: string;
+
   //  Relationship with USER
   @OneToOne(() => User, (user) => user.department)
   @JoinColumn({ name: 'responsible' })

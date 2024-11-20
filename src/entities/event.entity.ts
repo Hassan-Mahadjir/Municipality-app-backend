@@ -17,6 +17,9 @@ export class Event {
   @Column()
   title: string;
 
+  @Column({ nullable: true })
+  header: string;
+
   @Column()
   description: string;
 

@@ -39,6 +39,7 @@ export class EventService {
       startTime: createEventDto.startTime,
       date: createEventDto.date,
       images: images,
+      header: createEventDto.header,
       department: department,
       location: createEventDto.location,
       category: createEventDto.category,

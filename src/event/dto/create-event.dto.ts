@@ -11,6 +11,9 @@ export class CreateEventDto {
   location: string;
 
   @IsString()
+  header: string;
+
+  @IsString()
   category: string;
 
   @IsString()

@@ -11,10 +11,19 @@ import { ImageService } from 'src/image/image.service';
 import { UserService } from 'src/user/user.service';
 import { ProfileService } from 'src/profile/profile.service';
 import { Announcement } from 'src/entities/annoucemnet.entity';
+import { TranslationService } from 'src/translation/translation.service';
+import { AnnouncementTranslation } from 'src/entities/announcementTranslation.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Announcement, Image, User, Department, Profile]),
+    TypeOrmModule.forFeature([
+      Announcement,
+      Image,
+      User,
+      Department,
+      Profile,
+      AnnouncementTranslation,
+    ]),
   ],
   controllers: [AnnoucementController],
   providers: [
@@ -23,6 +32,7 @@ import { Announcement } from 'src/entities/annoucemnet.entity';
     ImageService,
     UserService,
     ProfileService,
+    TranslationService,
   ],
 })
 export class AnnoucementModule {}

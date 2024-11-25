@@ -16,6 +16,9 @@ export class CreateAnnoucementDto {
   @IsString()
   location: string;
 
+  @IsString()
+  language: string;
+
   @IsArray()
   imageUrls: string[];
 

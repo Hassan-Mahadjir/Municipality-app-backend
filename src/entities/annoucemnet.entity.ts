@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Department } from './department.entity';
 import { Image } from './image.entity';
+import { AnnouncementTranslation } from './announcementTranslation.entity';
 
 @Entity({ name: 'ANNOUNCEMENT' })
 export class Announcement {
@@ -30,6 +31,9 @@ export class Announcement {
   @Column({ default: 'Famagusta' })
   location: string;
 
+  @Column({ nullable: true })
+  language: string;
+
   // Relationship with DEPARTMNET
   @ManyToOne(() => Department, (department) => department.annoucenments)
   department: Department;
@@ -38,4 +42,11 @@ export class Announcement {
   @OneToMany(() => Image, (image) => image.announcemnet)
   @JoinColumn({ name: 'imageId' })
   images: Image[];
+
+  @OneToMany(
+    () => AnnouncementTranslation,
+    (translation) => translation.announcement,
+  )
+  @JoinColumn({ name: 'translationId' })
+  translations: AnnouncementTranslation[];
 }

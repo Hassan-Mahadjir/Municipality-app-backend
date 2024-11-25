@@ -23,6 +23,7 @@ import { AnnoucementModule } from './annoucement/annoucement.module';
 import { CommunityModule } from './community/community.module';
 import { CommentModule } from './comment/comment.module';
 import { EventModule } from './event/event.module';
+import { TranslationModule } from './translation/translation.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { EventModule } from './event/event.module';
     CommunityModule,
     CommentModule,
     EventModule,
+    TranslationModule,
   ],
   controllers: [AppController],
   providers: [

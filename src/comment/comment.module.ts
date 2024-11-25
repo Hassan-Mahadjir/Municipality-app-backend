@@ -13,6 +13,7 @@ import { ProfileService } from 'src/profile/profile.service';
 import { Comment } from 'src/entities/comment.entity';
 import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 import { TranslationService } from 'src/translation/translation.service';
+import { departmentTranslation } from 'src/entities/departmentTranslation.entity';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { TranslationService } from 'src/translation/translation.service';
       Profile,
       ProfileTranslation,
       HistoricalPlace,
+      departmentTranslation,
     ]),
   ],
   controllers: [CommentController],

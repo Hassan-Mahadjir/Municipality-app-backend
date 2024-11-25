@@ -9,10 +9,17 @@ import { ProfileService } from 'src/profile/profile.service';
 import { Profile } from 'src/entities/profile.entity';
 import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 import { TranslationService } from 'src/translation/translation.service';
+import { departmentTranslation } from 'src/entities/departmentTranslation.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Department, Profile, ProfileTranslation]),
+    TypeOrmModule.forFeature([
+      User,
+      Department,
+      Profile,
+      ProfileTranslation,
+      departmentTranslation,
+    ]),
   ],
   controllers: [DepartmentController],
   providers: [

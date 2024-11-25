@@ -11,6 +11,7 @@ import { DepartmentService } from 'src/department/department.service';
 import { ProfileService } from 'src/profile/profile.service';
 import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 import { TranslationService } from 'src/translation/translation.service';
+import { departmentTranslation } from 'src/entities/departmentTranslation.entity';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { TranslationService } from 'src/translation/translation.service';
       Department,
       Profile,
       ProfileTranslation,
+      departmentTranslation,
     ]),
   ],
   controllers: [ReportController],

@@ -11,6 +11,7 @@ import { User } from 'src/entities/user.entity';
 import { Profile } from 'src/entities/profile.entity';
 import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 import { TranslationService } from 'src/translation/translation.service';
+import { departmentTranslation } from 'src/entities/departmentTranslation.entity';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { TranslationService } from 'src/translation/translation.service';
       User,
       Profile,
       ProfileTranslation,
+      departmentTranslation,
     ]),
   ],
   controllers: [CollectedVehicleController],

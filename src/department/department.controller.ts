@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -14,6 +16,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { Role } from 'src/auth/enums/role.enums';
 import { PaginationDTO } from './dto/pagination.dto';
+import { UpdateDepartmentDto } from './dto/update-department.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('department')
@@ -37,5 +40,18 @@ export class DepartmentController {
   @Get(':id')
   async findOne(@Param('id', ParseIdPipe) id) {
     return await this.departmentService.findDepartment(id);
+  }
+
+  @Patch(':id')
+  async update(
+    @Param('id', ParseIdPipe) id,
+    @Body() updateDepartmentDto: UpdateDepartmentDto,
+  ) {
+    return await this.departmentService.update(id, updateDepartmentDto);
+  }
+
+  @Delete(':id')
+  delete(@Param('id', ParseIdPipe) id) {
+    return this.departmentService.remove(id);
   }
 }

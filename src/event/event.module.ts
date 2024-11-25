@@ -13,6 +13,7 @@ import { Image } from 'src/entities/image.entity';
 import { ImageService } from 'src/image/image.service';
 import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 import { TranslationService } from 'src/translation/translation.service';
+import { departmentTranslation } from 'src/entities/departmentTranslation.entity';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { TranslationService } from 'src/translation/translation.service';
       Profile,
       ProfileTranslation,
       Event,
+      departmentTranslation,
     ]),
   ],
   controllers: [EventController],

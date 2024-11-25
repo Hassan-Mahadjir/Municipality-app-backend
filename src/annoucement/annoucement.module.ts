@@ -14,6 +14,7 @@ import { Announcement } from 'src/entities/annoucemnet.entity';
 import { TranslationService } from 'src/translation/translation.service';
 import { AnnouncementTranslation } from 'src/entities/announcementTranslation.entity';
 import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
+import { departmentTranslation } from 'src/entities/departmentTranslation.entity';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
       Profile,
       ProfileTranslation,
       AnnouncementTranslation,
+      departmentTranslation,
     ]),
   ],
   controllers: [AnnoucementController],

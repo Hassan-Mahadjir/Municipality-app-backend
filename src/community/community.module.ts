@@ -18,6 +18,7 @@ import { AnimalShelter } from 'src/entities/shelter.entity';
 import { DisasterPoint } from 'src/entities/disaster-point.entity';
 import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 import { TranslationService } from 'src/translation/translation.service';
+import { departmentTranslation } from 'src/entities/departmentTranslation.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -32,6 +33,7 @@ import { TranslationService } from 'src/translation/translation.service';
       Animal,
       AnimalShelter,
       DisasterPoint,
+      departmentTranslation,
     ]),
   ],
   controllers: [CommunityController],

@@ -23,6 +23,7 @@ import { WasteType } from './waste-type.entity';
 import { Animal } from './animal.entity';
 import { AnimalShelter } from './shelter.entity';
 import { Event } from './event.entity';
+import { departmentTranslation } from './departmentTranslation.entity';
 
 @Entity({ name: 'DEPARTMENT' })
 export class Department {
@@ -37,6 +38,9 @@ export class Department {
 
   @Column({ nullable: true })
   description: string;
+
+  @Column()
+  language: string;
 
   @Column({ nullable: true })
   phone: string;
@@ -115,4 +119,12 @@ export class Department {
   // Relatinship with EVENT
   @OneToMany(() => Event, (event) => event.department)
   events: Event[];
+
+  // Translation Table
+  @OneToMany(
+    () => departmentTranslation,
+    (translation) => translation.department,
+  )
+  @JoinColumn({ name: 'translationId' })
+  translations: departmentTranslation[];
 }

@@ -15,4 +15,7 @@ export class CreateDepartmentDto {
 
   @IsString()
   description?: string;
+
+  @IsString()
+  language: string;
 }

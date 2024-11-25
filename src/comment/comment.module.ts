@@ -11,6 +11,8 @@ import { UserService } from 'src/user/user.service';
 import { DepartmentService } from 'src/department/department.service';
 import { ProfileService } from 'src/profile/profile.service';
 import { Comment } from 'src/entities/comment.entity';
+import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
+import { TranslationService } from 'src/translation/translation.service';
 
 @Module({
   imports: [
@@ -20,10 +22,17 @@ import { Comment } from 'src/entities/comment.entity';
       User,
       Department,
       Profile,
+      ProfileTranslation,
       HistoricalPlace,
     ]),
   ],
   controllers: [CommentController],
-  providers: [CommentService, UserService, DepartmentService, ProfileService],
+  providers: [
+    CommentService,
+    UserService,
+    DepartmentService,
+    ProfileService,
+    TranslationService,
+  ],
 })
 export class CommentModule {}

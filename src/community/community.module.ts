@@ -16,6 +16,8 @@ import { WasteType } from 'src/entities/waste-type.entity';
 import { Animal } from 'src/entities/animal.entity';
 import { AnimalShelter } from 'src/entities/shelter.entity';
 import { DisasterPoint } from 'src/entities/disaster-point.entity';
+import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
+import { TranslationService } from 'src/translation/translation.service';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -24,6 +26,7 @@ import { DisasterPoint } from 'src/entities/disaster-point.entity';
       User,
       Department,
       Profile,
+      ProfileTranslation,
       WasteSechdule,
       WasteType,
       Animal,
@@ -38,6 +41,7 @@ import { DisasterPoint } from 'src/entities/disaster-point.entity';
     ImageService,
     UserService,
     ProfileService,
+    TranslationService,
   ],
 })
 export class CommunityModule {}

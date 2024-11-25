@@ -54,7 +54,7 @@ export class AnnoucementService {
     const savedAnnouncement = await this.annoucementRepo.save(announcement);
 
     // Step 4: Define target languages
-    const allLanguages = ['EN', 'TR', 'AR']; // Example: English, Turkish
+    const allLanguages = ['EN', 'TR']; // Example: English, Turkish
     const sourceLang = createAnnouncementDto.language; // Original language
     const targetLanguages = allLanguages.filter((lang) => lang !== sourceLang); // Exclude original language
 

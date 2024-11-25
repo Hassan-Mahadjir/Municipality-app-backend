@@ -11,5 +11,8 @@ export class CreateAppointmentDto {
   date: string;
 
   @IsString()
+  language: string;
+
+  @IsString()
   startTime: string;
 }

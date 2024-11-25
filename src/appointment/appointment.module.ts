@@ -11,6 +11,9 @@ import { AvailabilityDay } from 'src/entities/availability-day.entity';
 import { UserService } from 'src/user/user.service';
 import { DepartmentService } from 'src/department/department.service';
 import { ProfileService } from 'src/profile/profile.service';
+import { AppointmentTranslation } from 'src/entities/appointmentTranslation.entity';
+import { TranslationService } from 'src/translation/translation.service';
+import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 
 @Module({
   imports: [
@@ -19,8 +22,10 @@ import { ProfileService } from 'src/profile/profile.service';
       Department,
       User,
       Profile,
+      ProfileTranslation,
       Availability,
       AvailabilityDay,
+      AppointmentTranslation,
     ]),
   ],
   controllers: [AppointmentController],
@@ -29,6 +34,7 @@ import { ProfileService } from 'src/profile/profile.service';
     UserService,
     DepartmentService,
     ProfileService,
+    TranslationService,
   ],
 })
 export class AppointmentModule {}

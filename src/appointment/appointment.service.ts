@@ -13,6 +13,9 @@ import { AvailabilityDay } from 'src/entities/availability-day.entity';
 import { DepartmentService } from 'src/department/department.service';
 import { UserService } from 'src/user/user.service';
 import { Appointment } from 'src/entities/appointment.entity';
+import { AnnouncementTranslation } from 'src/entities/announcementTranslation.entity';
+import { TranslationService } from 'src/translation/translation.service';
+import { AppointmentTranslation } from 'src/entities/appointmentTranslation.entity';
 
 @Injectable()
 export class AppointmentService {
@@ -25,10 +28,14 @@ export class AppointmentService {
     private dayRepo: Repository<AvailabilityDay>,
     private departmentService: DepartmentService,
     private userService: UserService,
+    @InjectRepository(AppointmentTranslation)
+    private translationRepo: Repository<AppointmentTranslation>,
+    private translationService: TranslationService,
   ) {}
 
   async create(createAppointmentDto: CreateAppointmentDto, userId: number) {
-    const { date, startTime, purpose, appointmentWith } = createAppointmentDto;
+    const { date, startTime, purpose, appointmentWith, language } =
+      createAppointmentDto;
 
     // Check if the user exists
     const user = await this.userService.findOne(userId);

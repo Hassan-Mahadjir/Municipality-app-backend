@@ -12,6 +12,8 @@ import { UserService } from 'src/user/user.service';
 import { ProfileService } from 'src/profile/profile.service';
 import { Day } from 'src/entities/day.entity';
 import { TimeTable } from 'src/entities/time-table.entity';
+import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
+import { TranslationService } from 'src/translation/translation.service';
 
 @Module({
   imports: [
@@ -21,11 +23,18 @@ import { TimeTable } from 'src/entities/time-table.entity';
       Department,
       User,
       Profile,
+      ProfileTranslation,
       Day,
       TimeTable,
     ]),
   ],
   controllers: [BusController],
-  providers: [BusService, DepartmentService, UserService, ProfileService],
+  providers: [
+    BusService,
+    DepartmentService,
+    UserService,
+    ProfileService,
+    TranslationService,
+  ],
 })
 export class BusModule {}

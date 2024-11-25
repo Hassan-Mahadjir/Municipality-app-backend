@@ -6,9 +6,11 @@ import { User } from 'src/entities/user.entity';
 import { Profile } from 'src/entities/profile.entity';
 import { APP_PIPE } from '@nestjs/core';
 import { ProfileService } from 'src/profile/profile.service';
+import { TranslationService } from 'src/translation/translation.service';
+import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Profile])],
+  imports: [TypeOrmModule.forFeature([User, Profile, ProfileTranslation])],
   controllers: [UserController],
   providers: [
     {
@@ -24,6 +26,7 @@ import { ProfileService } from 'src/profile/profile.service';
     },
     UserService,
     ProfileService,
+    TranslationService,
   ],
 })
 export class UserModule {}

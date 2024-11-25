@@ -11,10 +11,19 @@ import { UserService } from 'src/user/user.service';
 import { ProfileService } from 'src/profile/profile.service';
 import { Image } from 'src/entities/image.entity';
 import { ImageService } from 'src/image/image.service';
+import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
+import { TranslationService } from 'src/translation/translation.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Image, User, Department, Profile, Event]),
+    TypeOrmModule.forFeature([
+      Image,
+      User,
+      Department,
+      Profile,
+      ProfileTranslation,
+      Event,
+    ]),
   ],
   controllers: [EventController],
   providers: [
@@ -23,6 +32,7 @@ import { ImageService } from 'src/image/image.service';
     UserService,
     ProfileService,
     ImageService,
+    TranslationService,
   ],
 })
 export class EventModule {}

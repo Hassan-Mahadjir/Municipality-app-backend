@@ -17,4 +17,6 @@ export class CreateProfileDto {
   description?: string;
   @IsString()
   address?: string;
+  @IsString()
+  language: string;
 }

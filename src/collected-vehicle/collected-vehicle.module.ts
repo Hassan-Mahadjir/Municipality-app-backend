@@ -9,10 +9,18 @@ import { UserService } from 'src/user/user.service';
 import { ProfileService } from 'src/profile/profile.service';
 import { User } from 'src/entities/user.entity';
 import { Profile } from 'src/entities/profile.entity';
+import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
+import { TranslationService } from 'src/translation/translation.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CollectedVehicle, Department, User, Profile]),
+    TypeOrmModule.forFeature([
+      CollectedVehicle,
+      Department,
+      User,
+      Profile,
+      ProfileTranslation,
+    ]),
   ],
   controllers: [CollectedVehicleController],
   providers: [
@@ -20,6 +28,7 @@ import { Profile } from 'src/entities/profile.entity';
     DepartmentService,
     UserService,
     ProfileService,
+    TranslationService,
   ],
 })
 export class CollectedVehicleModule {}

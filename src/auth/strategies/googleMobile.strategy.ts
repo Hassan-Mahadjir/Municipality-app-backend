@@ -38,6 +38,7 @@ export class GoogleMobileStrategy extends PassportStrategy(
         firstName: profile.name.givenName,
         lastName: profile.name.familyName,
         avatar: profile.photos[0].value,
+        language: 'EN',
       },
     );
     return user;

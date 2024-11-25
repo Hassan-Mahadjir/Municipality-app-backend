@@ -13,6 +13,7 @@ import { ProfileService } from 'src/profile/profile.service';
 import { Announcement } from 'src/entities/annoucemnet.entity';
 import { TranslationService } from 'src/translation/translation.service';
 import { AnnouncementTranslation } from 'src/entities/announcementTranslation.entity';
+import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AnnouncementTranslation } from 'src/entities/announcementTranslation.en
       User,
       Department,
       Profile,
+      ProfileTranslation,
       AnnouncementTranslation,
     ]),
   ],

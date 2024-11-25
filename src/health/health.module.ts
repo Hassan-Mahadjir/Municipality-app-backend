@@ -10,12 +10,27 @@ import { User } from 'src/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 import { ProfileService } from 'src/profile/profile.service';
 import { Profile } from 'src/entities/profile.entity';
+import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
+import { TranslationService } from 'src/translation/translation.service';
 
 @Module({
   controllers: [HealthController],
-  providers: [HealthService, DepartmentService, UserService, ProfileService],
+  providers: [
+    HealthService,
+    DepartmentService,
+    UserService,
+    ProfileService,
+    TranslationService,
+  ],
   imports: [
-    TypeOrmModule.forFeature([Pharmacy, Hospital, Department, User, Profile]),
+    TypeOrmModule.forFeature([
+      Pharmacy,
+      Hospital,
+      Department,
+      User,
+      Profile,
+      ProfileTranslation,
+    ]),
   ],
 })
 export class HealthModule {}

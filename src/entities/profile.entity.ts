@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { User } from './user.entity';
 import { Gendar } from 'src/auth/enums/gendar.enums';
+import { ProfileTranslation } from './profileTranslation.entity';
 
 @Entity({ name: 'PROFILE' })
 export class Profile {
@@ -25,7 +26,7 @@ export class Profile {
   @Column({ nullable: true })
   avatar: string;
 
-  @Column({ type: 'enum', enum: Gendar, nullable: true })
+  @Column()
   gender: string;
 
   @Column({ nullable: true })
@@ -37,8 +38,19 @@ export class Profile {
   @Column({ nullable: true })
   address: string;
 
+  @Column()
+  language: string;
+
   // user profile
   @OneToOne(() => User, (user) => user.profile)
   @JoinColumn()
   user: User;
+
+  // Trasnlation Table
+  @OneToOne(() => ProfileTranslation, (translation) => translation.profile, {
+    cascade: true, // Automatically cascade operations
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'translationId' })
+  translation: ProfileTranslation;
 }

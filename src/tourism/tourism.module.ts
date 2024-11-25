@@ -12,6 +12,8 @@ import { ImageService } from 'src/image/image.service';
 import { UserService } from 'src/user/user.service';
 import { ProfileService } from 'src/profile/profile.service';
 import { HistoricalPlace } from 'src/entities/historical-place.entity';
+import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
+import { TranslationService } from 'src/translation/translation.service';
 
 @Module({
   imports: [
@@ -21,6 +23,7 @@ import { HistoricalPlace } from 'src/entities/historical-place.entity';
       User,
       Department,
       Profile,
+      ProfileTranslation,
       HistoricalPlace,
     ]),
   ],
@@ -31,6 +34,7 @@ import { HistoricalPlace } from 'src/entities/historical-place.entity';
     ImageService,
     UserService,
     ProfileService,
+    TranslationService,
   ],
 })
 export class TourismModule {}

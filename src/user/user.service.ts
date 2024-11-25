@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from 'src/entities/user.entity';
@@ -22,13 +26,23 @@ export class UserService {
     createUserDto: CreateUserDto,
     createProfileDto?: CreateProfileDto,
   ) {
-    const user = this.userRepo.create(createUserDto);
-    await this.userRepo.save(user);
-
-    if (createProfileDto) {
-      const userProile = this.profileSrevice.create(user.id, createProfileDto);
+    try {
+      const user = this.userRepo.create(createUserDto);
+      await this.userRepo.save(user);
+      if (createProfileDto) {
+        const userProile = this.profileSrevice.create(
+          user.id,
+          createProfileDto,
+        );
+      }
+      return { message: 'The user is created successfully', data: user };
+    } catch (error) {
+      if (error.code === '23505') {
+        // PostgreSQL error code for unique constraint violation
+        throw new ConflictException('Email already exists.');
+      }
+      throw error;
     }
-    return { message: 'The user is created successfully', data: user };
   }
 
   async findAll(paginationDTO: PaginationDTO) {

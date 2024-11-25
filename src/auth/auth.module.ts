@@ -21,10 +21,12 @@ import { ProfileService } from 'src/profile/profile.service';
 import { MailService } from 'src/mail/mail.service';
 import { GoogleMobileStrategy } from './strategies/googleMobile.strategy';
 import googleMobileOauthConfig from './config/google-mobile-oauth.config';
+import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
+import { TranslationService } from 'src/translation/translation.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Profile]),
+    TypeOrmModule.forFeature([User, Profile, ProfileTranslation]),
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(refreshJwtConfit),
@@ -35,6 +37,7 @@ import googleMobileOauthConfig from './config/google-mobile-oauth.config';
   providers: [
     AuthService,
     ProfileService,
+    TranslationService,
     MailService,
     UserService,
     LocalStrategy,

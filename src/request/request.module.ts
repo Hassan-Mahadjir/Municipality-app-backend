@@ -12,6 +12,9 @@ import { ProfileService } from 'src/profile/profile.service';
 import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 import { TranslationService } from 'src/translation/translation.service';
 import { departmentTranslation } from 'src/entities/departmentTranslation.entity';
+import { Image } from 'src/entities/image.entity';
+import { RequestTranslation } from 'src/entities/requestTranslation.entity';
+import { ImageService } from 'src/image/image.service';
 
 @Module({
   imports: [
@@ -22,6 +25,8 @@ import { departmentTranslation } from 'src/entities/departmentTranslation.entity
       Profile,
       ProfileTranslation,
       departmentTranslation,
+      Image,
+      RequestTranslation,
     ]),
   ],
   controllers: [RequestController],
@@ -31,6 +36,7 @@ import { departmentTranslation } from 'src/entities/departmentTranslation.entity
     DepartmentService,
     ProfileService,
     TranslationService,
+    ImageService,
   ],
 })
 export class RequestModule {}

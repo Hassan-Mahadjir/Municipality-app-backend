@@ -12,6 +12,9 @@ import { ProfileService } from 'src/profile/profile.service';
 import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 import { TranslationService } from 'src/translation/translation.service';
 import { departmentTranslation } from 'src/entities/departmentTranslation.entity';
+import { ReportTranslation } from 'src/entities/reportTranslation.entity';
+import { ImageService } from 'src/image/image.service';
+import { Image } from 'src/entities/image.entity';
 
 @Module({
   imports: [
@@ -20,8 +23,10 @@ import { departmentTranslation } from 'src/entities/departmentTranslation.entity
       User,
       Department,
       Profile,
+      Image,
       ProfileTranslation,
       departmentTranslation,
+      ReportTranslation,
     ]),
   ],
   controllers: [ReportController],
@@ -31,6 +36,7 @@ import { departmentTranslation } from 'src/entities/departmentTranslation.entity
     DepartmentService,
     ProfileService,
     TranslationService,
+    ImageService,
   ],
 })
 export class ReportModule {}

@@ -112,10 +112,14 @@ export class DepartmentService {
   }
 
   async findDepartmentbyName(name: string) {
-    return await this.departmentRepo.findOne({
-      where: { name: name },
-      relations: ['translations'],
-    });
+    const department = await this.departmentRepo
+      .createQueryBuilder('department')
+      .leftJoinAndSelect('department.translations', 'translation')
+      .where('department.name = :name', { name })
+      .orWhere('translation.name = :name', { name })
+      .getOne();
+
+    return department;
   }
 
   async update(id: number, updateDepartmentDto: UpdateDepartmentDto) {

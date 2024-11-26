@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsArray, IsString } from 'class-validator';
 
 export class CreateRequestDto {
   @IsString()
@@ -12,4 +12,10 @@ export class CreateRequestDto {
 
   @IsString()
   departmentName: string;
+
+  @IsString()
+  language: string;
+
+  @IsArray()
+  imageUrls: string[];
 }

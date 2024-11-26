@@ -4,6 +4,8 @@ import { HistoricalPlace } from './historical-place.entity';
 import { Announcement } from './annoucemnet.entity';
 import { Animal } from './animal.entity';
 import { Event } from './event.entity';
+import { Report } from './report.entity';
+import { Request } from './request.entity';
 
 @Entity({ name: 'IMAGE' })
 export class Image {
@@ -32,4 +34,12 @@ export class Image {
   // Relationship with EVENT
   @ManyToOne(() => Event, (event) => event.images)
   eventImage: Event;
+
+  // Relationship with REPORT
+  @ManyToOne(() => Report, (report) => report.images)
+  reportImage: Report;
+
+  // Relationship with REQUEST
+  @ManyToOne(() => Request, (request) => request.images)
+  requestImage: Request;
 }

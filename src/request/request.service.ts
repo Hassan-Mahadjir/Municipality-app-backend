@@ -108,7 +108,7 @@ export class RequestService {
 
     return {
       message: 'requests has been created successfully.',
-      data: { savedRequest },
+      data: savedRequest,
     };
   }
 

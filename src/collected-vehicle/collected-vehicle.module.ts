@@ -12,6 +12,7 @@ import { Profile } from 'src/entities/profile.entity';
 import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 import { TranslationService } from 'src/translation/translation.service';
 import { departmentTranslation } from 'src/entities/departmentTranslation.entity';
+import { CollectedVehicleTranslation } from 'src/entities/collected-vehicleTranslation.entity';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { departmentTranslation } from 'src/entities/departmentTranslation.entity
       Profile,
       ProfileTranslation,
       departmentTranslation,
+      CollectedVehicleTranslation,
     ]),
   ],
   controllers: [CollectedVehicleController],

@@ -62,7 +62,7 @@ export class Department {
   hospitals: Hospital[];
 
   // Relationship with COLLECTED-VEHICLE
-  @OneToMany(() => CollectedVehicle, (vehicle) => vehicle.departmnet)
+  @OneToMany(() => CollectedVehicle, (vehicle) => vehicle.department)
   collectedVehicles: CollectedVehicle[];
 
   // Relationship with LINE

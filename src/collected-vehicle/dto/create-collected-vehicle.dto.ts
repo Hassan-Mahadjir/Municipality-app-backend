@@ -1,4 +1,4 @@
-import { IsBoolean, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsString, IsUrl } from 'class-validator';
 
 export class CreateCollectedVehicleDto {
   @IsString()
@@ -19,8 +19,11 @@ export class CreateCollectedVehicleDto {
   @IsNumber()
   fee: number;
 
-  @IsBoolean()
-  status: boolean;
+  @IsUrl()
+  imageUrl: string;
+
+  @IsString()
+  language: string;
 
   @IsString()
   departmnetName: string;

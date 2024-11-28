@@ -77,6 +77,11 @@ export class BusController {
     return this.busService.createSechdule(createSechduleDto);
   }
 
+  @Get('station')
+  getAllSechdule(){
+    return this.busService.getAllSechdule()
+  }
+
   @Post('add-time')
   createBusTime(@Body() updateSechduleDto: UpdateSechduleDto) {
     return this.busService.createBusTime(updateSechduleDto);

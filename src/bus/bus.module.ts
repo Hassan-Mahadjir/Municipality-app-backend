@@ -15,6 +15,7 @@ import { TimeTable } from 'src/entities/time-table.entity';
 import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 import { TranslationService } from 'src/translation/translation.service';
 import { departmentTranslation } from 'src/entities/departmentTranslation.entity';
+import { dayTranslation } from 'src/entities/dayTranslation.entity';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { departmentTranslation } from 'src/entities/departmentTranslation.entity
       Day,
       TimeTable,
       departmentTranslation,
+      dayTranslation,
     ]),
   ],
   controllers: [BusController],

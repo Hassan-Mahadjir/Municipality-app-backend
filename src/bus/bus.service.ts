@@ -17,6 +17,8 @@ import { CreateSechduleDto } from './dto/create-sechdule.dto';
 import { Day } from 'src/entities/day.entity';
 import { TimeTable } from 'src/entities/time-table.entity';
 import { UpdateSechduleDto } from './dto/update-sechdule.dto';
+import { dayTranslation } from 'src/entities/dayTranslation.entity';
+import { TranslationService } from 'src/translation/translation.service';
 
 @Injectable()
 export class BusService {
@@ -26,6 +28,8 @@ export class BusService {
     private departmentService: DepartmentService,
     @InjectRepository(Day) private dayRepo: Repository<Day>,
     @InjectRepository(TimeTable) private timeTableRepo: Repository<TimeTable>,
+    @InjectRepository(dayTranslation) private translationRepo: Repository<dayTranslation>,
+    private translationService: TranslationService,
   ) {}
 
   async create(createBusDto: CreateLineDto) {
@@ -189,6 +193,8 @@ export class BusService {
 
   async updateStation(id: number, body: UpdateStation) {
     return await this.stationRepo.update({ id: id }, body);
+    // new commit
+    
   }
 
   async findAllStation() {
@@ -262,6 +268,9 @@ export class BusService {
     }
   }
 
+  async getAllSechdule(){
+    return await this.dayRepo.find({relations:['translations']});
+  }
   async createSechdule(createSechduleDto: CreateSechduleDto) {
     // Step 1: Check if all goTimes exist in the database
     const existingTimeTables = await this.timeTableRepo.find({
@@ -286,7 +295,7 @@ export class BusService {
     // Step 4: Check if a day with the same name already exists
     const existingDay = await this.dayRepo.find({
       where: { day: createSechduleDto.day },
-      relations: ['timeTable'], // Fetch timeTable relationship
+      relations: ['timeTable',"translations"], // Fetch timeTable relationship
     });
 
     if (existingDay.length > 0) {
@@ -316,15 +325,33 @@ export class BusService {
     }
 
     // Step 8: If no exact match is found, create a new day with the new goTimes
-    const newDay = this.dayRepo.create({
+    const newDay = await this.dayRepo.create({
       day: createSechduleDto.day,
+      language:createSechduleDto.language
     });
+
+    const savedNewDay = await this.dayRepo.save(newDay);
 
     // Assign the valid timeTable entries to the new day
     newDay.timeTable = existingTimeTables;
+    const allLanguages = ['EN', 'TR'];
+    const sourceLang = createSechduleDto.language;
+    const targetLanguages = allLanguages.filter((lang) => lang !== sourceLang);
+
+    for(const targetLang of targetLanguages){
+      const translatedDay = createSechduleDto.day?await this.translationService.translateText(createSechduleDto.day,targetLang):null;
+
+      const translatedTranslation = this.translationRepo.create({
+        day:translatedDay || 'Translation unavailable',
+        language:targetLang,
+        dayTranslation:savedNewDay
+      });
+
+      await this.translationRepo.save(translatedTranslation);
+    }
 
     // Step 9: Save the new day
-    return await this.dayRepo.save(newDay);
+    return {message:`Day has been created successfully`,data:savedNewDay}
   }
 
   async updateBusTime(dayId: number, updateBusTimeDto: UpdateSechduleDto) {

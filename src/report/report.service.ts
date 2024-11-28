@@ -108,7 +108,7 @@ export class ReportService {
 
     return {
       message: 'Report has been created successfully.',
-      data: { savedReport },
+      data: savedReport,
     };
   }
 

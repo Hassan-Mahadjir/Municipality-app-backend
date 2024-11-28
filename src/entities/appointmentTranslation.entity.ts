@@ -13,7 +13,7 @@ export class AppointmentTranslation {
   status: string;
 
   @Column()
-  appointmnetWith: string;
+  appointmentWith: string;
 
   @Column()
   language: string;

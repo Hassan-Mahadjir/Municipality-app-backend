@@ -15,6 +15,7 @@ import { AppointmentTranslation } from 'src/entities/appointmentTranslation.enti
 import { TranslationService } from 'src/translation/translation.service';
 import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 import { departmentTranslation } from 'src/entities/departmentTranslation.entity';
+import { AvailabilityDayTranslation } from 'src/entities/availability-dayTranslation.entity';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { departmentTranslation } from 'src/entities/departmentTranslation.entity
       AvailabilityDay,
       AppointmentTranslation,
       departmentTranslation,
+      AvailabilityDayTranslation,
     ]),
   ],
   controllers: [AppointmentController],

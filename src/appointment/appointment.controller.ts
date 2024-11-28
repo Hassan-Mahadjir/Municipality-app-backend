@@ -12,14 +12,23 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { CreateSlotDto } from './dto/create-slot.dto';
 import { ParseIdPipe } from 'src/user/pipes/paraseIdPipe';
+import { Roles } from 'src/auth/decorators/role.decorator';
+import { Role } from 'src/auth/enums/role.enums';
+import { UpdateSlotDto } from './dto/update-slot.dto';
 
 @Controller('appointment')
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
 
+  @Roles(Role.ADMIN, Role.STAFF)
   @Post('/slot')
   createSlots(@Body() createSlotDto: CreateSlotDto) {
     return this.appointmentService.createSlot(createSlotDto);
+  }
+
+  @Get('/slot')
+  getSlots() {
+    return this.appointmentService.getSlots();
   }
 
   @Post('/:id')
@@ -40,6 +49,12 @@ export class AppointmentController {
     return this.appointmentService.findOne(+id);
   }
 
+  @Get('user/:id')
+  findUserAppointments(@Param('id', ParseIdPipe) id) {
+    return this.appointmentService.getUserAppointments(id);
+  }
+
+  @Roles(Role.ADMIN, Role.STAFF)
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -48,6 +63,7 @@ export class AppointmentController {
     return this.appointmentService.update(+id, updateAppointmentDto);
   }
 
+  @Roles(Role.ADMIN, Role.STAFF)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.appointmentService.remove(+id);

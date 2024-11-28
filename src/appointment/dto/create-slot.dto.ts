@@ -13,5 +13,8 @@ export class CreateSlotDto {
   duration: number;
 
   @IsString()
+  language: string;
+
+  @IsString()
   departmentName: string;
 }

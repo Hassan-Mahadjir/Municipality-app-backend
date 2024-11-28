@@ -5,6 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
   OneToOne,
+  OneToMany,
 } from 'typeorm';
 import { User } from './user.entity';
 import { Availability } from './availability.entity';
@@ -18,7 +19,7 @@ export class Appointment {
   @Column()
   purpose: string;
 
-  @Column({ default: 'Pending' })
+  @Column()
   status: string;
 
   @Column()
@@ -38,7 +39,7 @@ export class Appointment {
   availability: Availability;
 
   // Traslation Table
-  @OneToOne(
+  @OneToMany(
     () => AppointmentTranslation,
     (translation) => translation.appointment,
   )

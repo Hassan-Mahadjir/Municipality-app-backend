@@ -12,12 +12,21 @@ import { CreateHospitalDto } from './dto/create-hospital.dto';
 import { UpdatePharmacyDto } from 'src/health/dto/update-pharmacy.dto';
 import { UpdateHospitalDto } from './dto/update-hospital.dto';
 import { DepartmentService } from 'src/department/department.service';
+import { HospitalTranslated } from 'src/entities/hospitalsTranslated.entity';
+import { pharmacyTranslated } from 'src/entities/pharmacyTranslated.entity';
+import { TranslationService } from 'src/translation/translation.service';
 @Injectable()
 export class HealthService {
   constructor(
     @InjectRepository(Pharmacy) private pharmacyRepo: Repository<Pharmacy>,
+    @InjectRepository(pharmacyTranslated)
+    private pharmacytranslationRepo: Repository<pharmacyTranslated>,
     @InjectRepository(Hospital) private hospitalRepo: Repository<Hospital>,
+    @InjectRepository(HospitalTranslated)
+    private hospitaltranslationRepo: Repository<HospitalTranslated>,
     private departmentService: DepartmentService,
+
+    private translationService: TranslationService,
   ) {}
   async createPharmacy(createPharmacyDto: CreatePharmacyDto) {
     const department = await this.departmentService.findDepartmentbyName(
@@ -38,7 +47,31 @@ export class HealthService {
       department: department,
     });
 
-    return this.pharmacyRepo.save(newPharmacy);
+    await this.pharmacyRepo.save(newPharmacy);
+
+    const allLanguages = ['EN', 'TR']; // Example: English, Turkish
+    const sourceLang = createPharmacyDto.language; // Original language
+    const targetLanguages = allLanguages.filter((lang) => lang !== sourceLang); // Exclude original language
+
+    // Step 5: Translate content for each target language
+    for (const targetLang of targetLanguages) {
+      const translatedLocation = createPharmacyDto.location
+        ? await this.translationService.translateText(
+            createPharmacyDto.location,
+            targetLang,
+          )
+        : null;
+      const translatedTranslation = this.pharmacyRepo.create({
+        location: translatedLocation || 'Translation unaialable',
+        language: targetLang, // Store the translated language, // Link to the original announcement
+      });
+
+      await this.hospitaltranslationRepo.save(translatedTranslation);
+    }
+    return {
+      message: 'Pharmacy created successfully with translations.',
+      data: newPharmacy,
+    };
   }
 
   findAllPharmacy() {
@@ -81,6 +114,28 @@ export class HealthService {
     });
 
     return this.hospitalRepo.save(newHospital);
+    const allLanguages = ['EN', 'TR']; // Example: English, Turkish
+    const sourceLang = createHospitalDto.language; // Original language
+    const targetLanguages = allLanguages.filter((lang) => lang !== sourceLang); // Exclude original language
+
+    for (const targetLang of targetLanguages) {
+      const translatedLocation = createHospitalDto.location
+        ? await this.translationService.translateText(
+            createHospitalDto.location,
+            targetLang,
+          )
+        : null;
+      const translatedTranslation = this.pharmacyRepo.create({
+        location: translatedLocation || 'Translation unavailable',
+        language: targetLang, // Store the translated language, // Link to the original announcement
+      });
+
+      await this.hospitaltranslationRepo.save(translatedTranslation);
+    }
+    return {
+      message: 'Hospital created successfully with translations.',
+      data: newHospital,
+    };
     // return this.hospitalRepo.save(CreateHospitalDto);
   }
 

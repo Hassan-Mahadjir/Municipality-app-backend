@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Department } from './department.entity';
+import { pharmacyTranslated } from './pharmacyTranslated.entity';
 
 @Entity({ name: 'PHARMACY' })
 export class Pharmacy {
@@ -26,9 +27,17 @@ export class Pharmacy {
 
   @Column()
   openthisWeek: boolean;
+  @Column()
+  language: string;
 
   // Relationship with DEPARTMENT
   @ManyToOne(() => Department, (service) => service)
   @JoinColumn({ name: 'departmentId' })
   department: Department;
+  @ManyToOne(
+    () => pharmacyTranslated,
+    (pharmacyTranslated) => pharmacyTranslated.pharmacy,
+  )
+  @JoinColumn({ name: 'translationid' })
+  translations: pharmacyTranslated[];
 }

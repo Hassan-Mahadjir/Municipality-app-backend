@@ -3,15 +3,14 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from './user.entity';
 import { Department } from './department.entity';
-import { HospitalTranslated } from './hospitalsTranslated.entity';
+import { Pharmacy } from './pharmacy.entity';
 
-@Entity({ name: 'HOSPITAL' })
-export class Hospital {
+@Entity({ name: 'PHARMACYTRANSLATED' })
+export class pharmacyTranslated {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -26,18 +25,16 @@ export class Hospital {
 
   @Column()
   logo: string;
+
+  @Column()
+  openthisWeek: boolean;
   @Column()
   language: string;
 
   // Relationship with DEPARTMENT
-
-  @ManyToOne(() => Department, (department) => department.hospitals)
+  @ManyToOne(() => Department, (service) => service)
   @JoinColumn({ name: 'departmentId' })
   department: Department;
-  @ManyToOne(
-    () => HospitalTranslated,
-    (HospitalTranslated) => HospitalTranslated.hospital,
-  )
-  @JoinColumn({ name: 'translationid' })
-  translations: HospitalTranslated[];
+  @OneToMany(() => Pharmacy, (Pharmacy) => Pharmacy.translations)
+  pharmacy: Pharmacy[];
 }

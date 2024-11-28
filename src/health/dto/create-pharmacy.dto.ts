@@ -13,4 +13,6 @@ export class CreatePharmacyDto {
   openthisWeek: boolean;
   @IsString()
   departmetName: string;
+  @IsString()
+  language: string;
 }

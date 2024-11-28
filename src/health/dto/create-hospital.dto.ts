@@ -11,4 +11,6 @@ export class CreateHospitalDto {
   logo: string;
   @IsString()
   departmetName?: string;
+  @IsString()
+  language: string;
 }

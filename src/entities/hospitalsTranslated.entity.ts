@@ -16,8 +16,7 @@ export class HospitalTranslated {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  name: string;
+ 
 
   @Column()
   location: string;
@@ -25,8 +24,7 @@ export class HospitalTranslated {
   @Column({ nullable: true })
   imageUrl: string;
 
-  @Column()
-  logo: string;
+
   @Column()
   language: string;
 

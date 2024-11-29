@@ -61,12 +61,12 @@ export class HealthService {
             targetLang,
           )
         : null;
-      const translatedTranslation = this.pharmacyRepo.create({
+      const translatedTranslation = this.pharmacytranslationRepo.create({
         location: translatedLocation || 'Translation unaialable',
         language: targetLang, // Store the translated language, // Link to the original announcement
       });
 
-      await this.hospitaltranslationRepo.save(translatedTranslation);
+      await this.pharmacytranslationRepo.save(translatedTranslation);
     }
     return {
       message: 'Pharmacy created successfully with translations.',
@@ -83,9 +83,10 @@ export class HealthService {
       where: {
         id: id,
       },
+      relations: ['translations'], 
     });
   }
-
+  
   async updatePharmcay(id: number, updatePharmacyDto: UpdatePharmacyDto) {
     return this.pharmacyRepo.update({ id }, updatePharmacyDto);
   }
@@ -102,22 +103,22 @@ export class HealthService {
       throw new NotFoundException(
         `The department with ${createHospitalDto.departmetName} does not exists.`,
       );
-
+  
     if (createHospitalDto.departmetName.toLocaleLowerCase() != 'health')
       throw new UnauthorizedException(
         'The service is not allowed to be assigned here',
       );
-
+  
     const newHospital = await this.hospitalRepo.create({
       ...createHospitalDto,
       department: department,
     });
-
-    return this.hospitalRepo.save(newHospital);
+  
+    // Handle translation logic before saving the hospital
     const allLanguages = ['EN', 'TR']; // Example: English, Turkish
     const sourceLang = createHospitalDto.language; // Original language
     const targetLanguages = allLanguages.filter((lang) => lang !== sourceLang); // Exclude original language
-
+  
     for (const targetLang of targetLanguages) {
       const translatedLocation = createHospitalDto.location
         ? await this.translationService.translateText(
@@ -125,19 +126,23 @@ export class HealthService {
             targetLang,
           )
         : null;
-      const translatedTranslation = this.pharmacyRepo.create({
+      const translatedTranslation = this.hospitaltranslationRepo.create({
         location: translatedLocation || 'Translation unavailable',
-        language: targetLang, // Store the translated language, // Link to the original announcement
+        language: targetLang, // Store the translated language
       });
-
+  
       await this.hospitaltranslationRepo.save(translatedTranslation);
     }
+  
+    // Save the new hospital after translations
+    const savedHospital = await this.hospitalRepo.save(newHospital);
+  
     return {
       message: 'Hospital created successfully with translations.',
-      data: newHospital,
+      data: savedHospital,
     };
-    // return this.hospitalRepo.save(CreateHospitalDto);
   }
+  
 
   findAllHospital() {
     return this.hospitalRepo.find();

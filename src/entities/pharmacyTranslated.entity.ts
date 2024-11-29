@@ -15,26 +15,16 @@ export class pharmacyTranslated {
   id: number;
 
   @Column()
-  name: string;
-
-  @Column()
   location: string;
 
-  @Column({ nullable: true })
-  imageUrl: string;
 
-  @Column()
-  logo: string;
 
-  @Column()
-  openthisWeek: boolean;
   @Column()
   language: string;
 
   // Relationship with DEPARTMENT
-  @ManyToOne(() => Department, (service) => service)
-  @JoinColumn({ name: 'departmentId' })
-  department: Department;
+
+
   @OneToMany(() => Pharmacy, (Pharmacy) => Pharmacy.translations)
   pharmacy: Pharmacy[];
 }

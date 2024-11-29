@@ -13,6 +13,8 @@ import { Profile } from 'src/entities/profile.entity';
 import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 import { TranslationService } from 'src/translation/translation.service';
 import { departmentTranslation } from 'src/entities/departmentTranslation.entity';
+import { HospitalTranslated } from 'src/entities/hospitalsTranslated.entity';
+import { pharmacyTranslated } from 'src/entities/pharmacyTranslated.entity';
 
 @Module({
   controllers: [HealthController],
@@ -32,6 +34,8 @@ import { departmentTranslation } from 'src/entities/departmentTranslation.entity
       Profile,
       ProfileTranslation,
       departmentTranslation,
+      HospitalTranslated,
+      pharmacyTranslated,
     ]),
   ],
 })

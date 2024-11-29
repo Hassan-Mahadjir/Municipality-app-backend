@@ -406,10 +406,10 @@ export class BusService {
   }
 
   async updateBusTime(dayId: number, updateBusTimeDto: UpdateSechduleDto) {
-    // Step 1: Retrieve the day by id with existing timeTable relations
+    // Step 1: Retrieve the day by ID with existing timeTable and translations relations
     const day = await this.dayRepo.findOne({
       where: { id: dayId },
-      relations: ['timeTable'],
+      relations: ['timeTable', 'translations'],
     });
 
     if (!day) {
@@ -418,26 +418,68 @@ export class BusService {
 
     // Step 2: Update the day name if provided
     if (updateBusTimeDto.day) {
-      day.day = updateBusTimeDto.day;
+      let translatedDay = updateBusTimeDto.day; // Default to the input day
+
+      // Translate to English if the input language is not English
+      if (updateBusTimeDto.language !== 'EN') {
+        translatedDay = await this.translationService.translateText(
+          updateBusTimeDto.day,
+          'EN',
+        );
+      }
+
+      day.day = translatedDay;
+
+      // Step 3: Update or add translations for the day name
+      const allLanguages = ['EN', 'TR']; // Add more languages if necessary
+      const targetLanguages = allLanguages.filter(
+        (lang) => lang !== 'EN', // Exclude English for translation
+      );
+
+      for (const targetLang of targetLanguages) {
+        // Translate the day name to the target language
+        const translatedText = await this.translationService.translateText(
+          updateBusTimeDto.day,
+          targetLang,
+        );
+
+        // Check if a translation for this language already exists
+        const existingTranslation = day.translations.find(
+          (translation) => translation.language === targetLang,
+        );
+
+        if (existingTranslation) {
+          // Update the existing translation
+          existingTranslation.day = translatedText || 'Translation unavailable';
+        } else {
+          // Add a new translation
+          const newTranslation = this.translationRepo.create({
+            day: translatedText || 'Translation unavailable',
+            language: targetLang,
+            dayTranslation: day,
+          });
+
+          await this.translationRepo.save(newTranslation);
+        }
+      }
     }
 
-    // Step 3: Update goTimes if provided, ensuring no duplicates
+    // Step 4: Update goTimes if provided, ensuring no duplicates
     if (updateBusTimeDto.goTimes && Array.isArray(updateBusTimeDto.goTimes)) {
       // Remove duplicate goTimes from the request
       const uniqueGoTimes = Array.from(new Set(updateBusTimeDto.goTimes));
 
-      // Check if all unique goTimes are present in the timeTableRepo
+      // Check if all unique goTimes exist in the database
       const newGoTimes = await this.timeTableRepo.find({
         where: { goTime: In(uniqueGoTimes) },
       });
 
       if (newGoTimes.length !== uniqueGoTimes.length) {
-        // Identify missing goTimes by checking if each unique goTime is in newGoTimes
+        // Identify missing goTimes
         const missingGoTimes = uniqueGoTimes.filter(
           (goTime) => !newGoTimes.some((time) => time.goTime === goTime),
         );
 
-        // Throw an error listing each missing goTime
         throw new NotFoundException(
           `The following goTimes are not in the database: ${missingGoTimes.join(', ')}. Please add these times before updating.`,
         );
@@ -447,8 +489,13 @@ export class BusService {
       day.timeTable = newGoTimes;
     }
 
-    // Step 4: Save the updated day
-    return await this.dayRepo.save(day);
+    // Step 5: Save the updated day
+    const updatedDay = await this.dayRepo.save(day);
+
+    return {
+      message: `Day has been updated successfully.`,
+      data: updatedDay,
+    };
   }
 
   async deleteBusTime(dayId: number) {

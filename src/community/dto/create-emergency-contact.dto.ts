@@ -9,4 +9,7 @@ export class CreateEmergencyContactDto {
 
   @IsString()
   departmentName: string;
+
+  @IsString()
+  language: string;
 }

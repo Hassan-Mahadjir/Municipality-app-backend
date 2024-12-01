@@ -32,6 +32,8 @@ import { UpdateAnimalShelterDto } from './dto/update-animal-shelter.dto';
 import { CreateDisasterPointDto } from './dto/create-disaster-point.dto';
 import { DisasterPoint } from 'src/entities/disaster-point.entity';
 import { UpdateDisasterPointDto } from './dto/update-disaster-point.dto';
+import { TranslationService } from 'src/translation/translation.service';
+import { EmergencyContactTranslation } from 'src/entities/emergency-contactTranslations.entity';
 
 @Injectable()
 export class CommunityService {
@@ -49,6 +51,9 @@ export class CommunityService {
     private animalShelterRepo: Repository<AnimalShelter>,
     @InjectRepository(DisasterPoint)
     private disasterPointRepo: Repository<DisasterPoint>,
+    private translationService: TranslationService,
+    @InjectRepository(EmergencyContactTranslation)
+    private emergencyTranslationsReppo: Repository<EmergencyContactTranslation>,
   ) {}
   async createEmergencyContact(
     createEmergencyContactDto: CreateEmergencyContactDto,
@@ -86,7 +91,21 @@ export class CommunityService {
       department: department,
     });
 
-    return this.emergencyRepo.save(newContact);
+    const newContactInfo = this.emergencyRepo.save(newContact);
+
+    // Step 4: Define target languages
+    const allLanguages = ['EN', 'TR']; // Example: English, Turkish
+    const sourceLang = createEmergencyContactDto.language; // Original language
+    const targetLanguages = allLanguages.filter((lang) => lang !== sourceLang); // Exclude original language
+
+    for (const targetLang of targetLanguages) {
+      const translatedName = createEmergencyContactDto.name
+        ? await this.translationService.translateText(
+            createEmergencyContactDto.name,
+            targetLang,
+          )
+        : null;
+    }
   }
 
   async findAllEmergencyContacts() {

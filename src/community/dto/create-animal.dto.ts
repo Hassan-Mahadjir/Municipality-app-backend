@@ -5,9 +5,6 @@ export class CreateAnimalDto {
   title: string;
 
   @IsString()
-  status: string;
-
-  @IsString()
   description: string;
 
   @IsString()
@@ -18,4 +15,7 @@ export class CreateAnimalDto {
 
   @IsArray()
   imageUrls: string[];
+
+  @IsString()
+  language: string;
 }

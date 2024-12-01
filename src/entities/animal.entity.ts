@@ -10,6 +10,7 @@ import {
 import { Department } from './department.entity';
 import { User } from './user.entity';
 import { Image } from './image.entity';
+import { AnimalTranslation } from './animalTranslation.entity';
 
 @Entity({ name: 'AMINAL' })
 export class Animal {
@@ -34,6 +35,9 @@ export class Animal {
   @CreateDateColumn()
   createAt: Date;
 
+  @Column()
+  language: string;
+
   //   Relationship wiht DEPARTMENT
   @ManyToOne(() => Department, (department) => department.animals)
   @JoinColumn({ name: 'departmentId' })
@@ -48,4 +52,9 @@ export class Animal {
   @OneToMany(() => Image, (image) => image.animal)
   @JoinColumn({ name: 'imageId' })
   images: Image[];
+
+  // Translation Table
+  @OneToMany(() => AnimalTranslation, (animalReport) => animalReport)
+  @JoinColumn({ name: 'translationId' })
+  translations: AnimalTranslation[];
 }

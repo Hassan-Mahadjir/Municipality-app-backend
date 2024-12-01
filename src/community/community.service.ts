@@ -34,6 +34,7 @@ import { DisasterPoint } from 'src/entities/disaster-point.entity';
 import { UpdateDisasterPointDto } from './dto/update-disaster-point.dto';
 import { TranslationService } from 'src/translation/translation.service';
 import { EmergencyContactTranslation } from 'src/entities/emergency-contactTranslations.entity';
+import { AnimalTranslation } from 'src/entities/animalTranslation.entity';
 
 @Injectable()
 export class CommunityService {
@@ -54,6 +55,8 @@ export class CommunityService {
     private translationService: TranslationService,
     @InjectRepository(EmergencyContactTranslation)
     private emergencyTranslationsReppo: Repository<EmergencyContactTranslation>,
+    @InjectRepository(AnimalTranslation)
+    private animalTranslationRepo: Repository<AnimalTranslation>,
   ) {}
   async createEmergencyContact(
     createEmergencyContactDto: CreateEmergencyContactDto,
@@ -409,20 +412,72 @@ export class CommunityService {
         images.push(image);
       }
     }
+    // Translate the default status into the report's language
+    const translatedStatus = await this.translationService.translateText(
+      'Lost',
+      createAnimalDto.language,
+    );
 
     // Create the new animal report with associated images
     const newReport = this.animalRepo.create({
       title: createAnimalDto.title,
-      status: createAnimalDto.status,
+      status: translatedStatus || 'Lost',
       description: createAnimalDto.description,
       contactInfo: createAnimalDto.contactInfo,
       location: createAnimalDto.location,
       department: department,
+      language: createAnimalDto.language,
       user: user,
       images: images, // Associate the images with the report
     });
 
-    return await this.animalRepo.save(newReport);
+    const savedAnimalReport = await this.animalRepo.save(newReport);
+
+    // Define target languages
+    const allLanguages = ['EN', 'TR'];
+    const sourceLang = createAnimalDto.language;
+    const targetLanguages = allLanguages.filter((lang) => lang !== sourceLang);
+
+    for (const targetLang of targetLanguages) {
+      const translatedTitle = createAnimalDto.title
+        ? await this.translationService.translateText(
+            createAnimalDto.title,
+            targetLang,
+          )
+        : null;
+      const translatedLocation = createAnimalDto.location
+        ? await this.translationService.translateText(
+            createAnimalDto.location,
+            targetLang,
+          )
+        : null;
+      const translatedDescription = createAnimalDto.description
+        ? await this.translationService.translateText(
+            createAnimalDto.description,
+            targetLang,
+          )
+        : null;
+      const targetStatus = await this.translationService.translateText(
+        'Lost',
+        targetLang,
+      );
+
+      const translatedTranslation = this.animalTranslationRepo.create({
+        status: targetStatus || translatedStatus || 'Lost',
+        title: translatedTitle,
+        location: translatedLocation,
+        description: translatedDescription,
+        language: targetLang,
+        animal: savedAnimalReport,
+      });
+
+      await this.animalTranslationRepo.save(translatedTranslation);
+
+      return {
+        message: 'Animal report has been created sluccessfylly.',
+        data: savedAnimalReport,
+      };
+    }
   }
 
   async findAinmalReport(id: number) {

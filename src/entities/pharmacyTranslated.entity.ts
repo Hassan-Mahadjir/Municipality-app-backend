@@ -25,6 +25,6 @@ export class pharmacyTranslated {
   // Relationship with DEPARTMENT
 
 
-  @OneToMany(() => Pharmacy, (Pharmacy) => Pharmacy.translations)
-  pharmacy: Pharmacy[];
+  @ManyToOne(() => Pharmacy, (pharmacy) => pharmacy.translations)
+  pharmacy: Pharmacy;
 }

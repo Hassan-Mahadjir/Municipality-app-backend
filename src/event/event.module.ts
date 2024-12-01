@@ -14,7 +14,7 @@ import { ImageService } from 'src/image/image.service';
 import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 import { TranslationService } from 'src/translation/translation.service';
 import { departmentTranslation } from 'src/entities/departmentTranslation.entity';
-
+import { eventTranslated } from 'src/entities/eventTransation.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -24,6 +24,7 @@ import { departmentTranslation } from 'src/entities/departmentTranslation.entity
       Profile,
       ProfileTranslation,
       Event,
+      eventTranslated,
       departmentTranslation,
     ]),
   ],

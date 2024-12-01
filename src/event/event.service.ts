@@ -5,15 +5,19 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DepartmentService } from 'src/department/department.service';
 import { Image } from 'src/entities/image.entity';
 import { Event } from 'src/entities/event.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { ImageService } from 'src/image/image.service';
+import { eventTranslated } from 'src/entities/eventTransation.entity';
+import { TranslationService } from 'src/translation/translation.service';
 
-@Injectable()
 export class EventService {
   constructor(
     private departmentService: DepartmentService,
     @InjectRepository(Event) private eventRepo: Repository<Event>,
     private imageService: ImageService,
+    @InjectRepository(eventTranslated) private eventTranslatedRepo: Repository<eventTranslated>,
+    private translationRepo: Repository<eventTranslated>,
+    private translationService: TranslationService,
   ) {}
   async create(createEventDto: CreateEventDto) {
     const department = await this.departmentService.findDepartmentbyName(
@@ -44,24 +48,76 @@ export class EventService {
       location: createEventDto.location,
       category: createEventDto.category,
     });
-    return await this.eventRepo.save(newEvent);
+    const savedEvent= await this.eventRepo.save(newEvent);
+    const allLanguages = ['EN', 'TR']; // Example: English, Turkish
+    const sourceLang = createEventDto.language; // Original language
+    const targetLanguages = allLanguages.filter((lang) => lang !== sourceLang); // Exclude original language
+    for (const targetLang of targetLanguages) {
+      const translatedTitle = createEventDto.title
+        ? await this.translationService.translateText(
+            createEventDto.title,
+            targetLang,
+          )
+        : null;
+      const translatedHeader = await this.translationService.translateText(
+        createEventDto.header,
+        targetLang,
+      );
+      const translatedDescription = await this.translationService.translateText(
+        createEventDto.description,
+        targetLang,
+      );
+      const translatedLocation = await this.translationService.translateText(
+        createEventDto.location,
+        targetLang,
+      );
+      const translatedCategory = await this.translationService.translateText(
+        createEventDto.category,
+        targetLang,
+      );
+
+      // Step 6: Save each translation
+      const translatedTranslation = this.translationRepo.create({
+        title: translatedTitle || 'Translation unavailable',
+        header: translatedHeader || 'Translation unavailable',
+        description: translatedDescription || 'Translation unavailable',
+        location: translatedLocation || 'Translation unaialable',
+        language: targetLang, // Store the translated language
+        event: savedEvent, // Link to the original 
+      });
+
+      await this.translationRepo.save(translatedTranslation);
+    }
+    return {
+      message: 'Event created successfully with translations.',
+      data: savedEvent,
+    };
+
+  
   }
 
   async findAll() {
-    const events = await this.eventRepo.find({ relations: ['images'] });
-    return events;
+    const events = await this.eventRepo.find({ relations: ['images','translations'] });
+    const totalFetched= events.length;
+    const message=`Successfully fetched ${totalFetched}events`
+
+    return {message: message, data :events}
   }
 
   async findOne(id: number) {
     const event = await this.eventRepo.findOne({
       where: { id: id },
-      relations: ['images'],
+      relations: ['images', 'translations'],
     });
-
-    if (!event)
+  
+    if (!event) {
       throw new NotFoundException(`The event with ID:${id} does not exist.`);
-    return event;
+    }
+  
+    const message = `Successfully fetched event`;
+    return { message, data: event };
   }
+  
 
   async update(id: number, updateEventDto: UpdateEventDto) {
     const event = await this.eventRepo.findOne({

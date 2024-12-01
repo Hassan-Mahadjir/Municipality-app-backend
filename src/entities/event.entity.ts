@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Department } from './department.entity';
 import { Image } from './image.entity';
+import { eventTranslated } from './eventTransation.entity';
 
 @Entity({ name: 'EVENT' })
 export class Event {
@@ -34,6 +35,8 @@ export class Event {
 
   @Column()
   date: string;
+  @Column()
+  language:string;
 
   // Relationship with DEPARTMENT
   @ManyToOne(() => Department, (department) => department.events)
@@ -44,4 +47,8 @@ export class Event {
   @OneToMany(() => Image, (image) => image.eventImage)
   @JoinColumn({ name: 'imageId' })
   images: Image[];
+  
+  @OneToMany(()=> eventTranslated,(eventTranslated)=>eventTranslated.event,)
+  @JoinColumn({ name: 'eventTranslatedId' })
+  translations: eventTranslated[];
 }

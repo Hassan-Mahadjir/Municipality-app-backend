@@ -9,6 +9,7 @@ import {
 import { Department } from './department.entity';
 import { Image } from './image.entity';
 import { Comment } from './comment.entity';
+import { RestaurantTranslation } from './restaurantTranslations.entity';
 
 @Entity({ name: 'RESTAURANT' })
 export class Restaurant {
@@ -39,6 +40,9 @@ export class Restaurant {
   @Column()
   closingHrWeekend: string;
 
+  @Column()
+  language: string;
+
   // Relationship with DEPARTMENT
   @ManyToOne(() => Department, (department) => department.restaurants)
   @JoinColumn({ name: 'departmentId' })
@@ -52,4 +56,9 @@ export class Restaurant {
   // Relationship with COMMENT
   @OneToMany(() => Comment, (comment) => comment.restaurant)
   restaurantComments: Comment[];
+
+  // Translation Table
+  @OneToMany(() => RestaurantTranslation, (restaurant) => restaurant.restaurant)
+  @JoinColumn({ name: 'translationsId' })
+  translations: RestaurantTranslation[];
 }

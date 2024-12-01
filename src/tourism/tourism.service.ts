@@ -16,6 +16,7 @@ import { CreateHistoricalPlaceDto } from './dto/create-historical-place';
 import { UpdateHistoricalPlaceDto } from './dto/update-historical-place';
 import { TranslationService } from 'src/translation/translation.service';
 import { HistoricalPlaceTranslation } from 'src/entities/historical-pladceTranslation.entity';
+import { RestaurantTranslation } from 'src/entities/restaurantTranslations.entity';
 
 @Injectable()
 export class TourismService {
@@ -29,6 +30,8 @@ export class TourismService {
     private translationService: TranslationService,
     @InjectRepository(HistoricalPlaceTranslation)
     private historicalPlaceTransaltionRepo: Repository<HistoricalPlaceTranslation>,
+    @InjectRepository(RestaurantTranslation)
+    private restaurantTranslationRepo: Repository<RestaurantTranslation>,
   ) {}
 
   async createRestaurant(createRestaruantDto: CreateRestaurantDto) {
@@ -66,18 +69,52 @@ export class TourismService {
       closingHrWeekday: createRestaruantDto.closingHrWeekday,
       closingHrWeekend: createRestaruantDto.closingHrWeekend,
       department: department,
+      language: createRestaruantDto.language,
       images: images, // Ensure this is an array of Image entities
     });
 
     // Save the new restaurant
     const savedRestaurant = await this.restaurantRepo.save(newRestaurant);
-    return savedRestaurant; // This should return the new restaurant with associated images
+
+    // Define taget Languages
+    // Define target languages
+    const allLanguages = ['EN', 'TR'];
+    const sourceLang = createRestaruantDto.language;
+    const targetLanguages = allLanguages.filter((lang) => lang !== sourceLang);
+
+    // Create translations for target languages
+    for (const targetLang of targetLanguages) {
+      const translatedLocation = createRestaruantDto.location
+        ? await this.translationService.translateText(
+            createRestaruantDto.location,
+            targetLang,
+          )
+        : null;
+
+      const translatedTranslation = this.restaurantTranslationRepo.create({
+        location: translatedLocation,
+        language: targetLang,
+        restaurant: savedRestaurant,
+      });
+
+      await this.restaurantTranslationRepo.save(translatedTranslation);
+    }
+
+    return {
+      messsage: 'restaurant has been created successfully.',
+      data: savedRestaurant,
+    };
   }
 
   async findAllRestaurant() {
-    return await this.restaurantRepo.find({
-      relations: ['images'],
+    const restaurants = await this.restaurantRepo.find({
+      relations: ['images', 'translations'],
     });
+
+    return {
+      message: `Successfully fetched ${restaurants.length} requests`,
+      data: restaurants,
+    };
   }
 
   async findOneRestaurant(id: number) {
@@ -90,13 +127,16 @@ export class TourismService {
       throw new NotFoundException(
         `The Restaurant with ID:${id} does not exits.`,
       );
-    return restaurant;
+    return {
+      message: 'Restaurant has been fetched successfully',
+      data: restaurant,
+    };
   }
 
   async updateRestaurant(id: number, updateRestaurantDto: UpdateRestaurantDto) {
     const restaurant = await this.restaurantRepo.findOne({
       where: { id: id },
-      relations: ['images'],
+      relations: ['images', 'translations'],
     });
 
     if (!restaurant) {
@@ -129,8 +169,41 @@ export class TourismService {
       }
     }
 
+    if (updateRestaurantDto.location) {
+      // Define target languages
+      const allLanguages = ['EN', 'TR'];
+      const sourceLang = updateRestaurantDto.language || restaurant.language;
+      const targetLanguages = allLanguages.filter(
+        (lang) => lang !== sourceLang,
+      );
+
+      for (const targetLang of targetLanguages) {
+        let existingTranslation = restaurant.translations.find(
+          (translation) => translation.language === targetLang,
+        );
+
+        const translatedLocation = updateRestaurantDto.location
+          ? await this.translationService.translateText(
+              updateRestaurantDto.location,
+              targetLang,
+            )
+          : existingTranslation.location;
+        if (existingTranslation) {
+          Object.assign(existingTranslation, { locations: translatedLocation });
+        } else {
+          existingTranslation = this.restaurantTranslationRepo.create({
+            location: translatedLocation || 'Translation unavailable',
+          });
+          restaurant.translations.push(existingTranslation);
+        }
+
+        await this.restaurantTranslationRepo.save(existingTranslation);
+      }
+    }
     // Save the updated restaurant with the new images
-    return await this.restaurantRepo.save(restaurant);
+    const updatedRestaurant = await this.restaurantRepo.save(restaurant);
+
+    return { message: `The restaurant with #ID: ${id} has been updated.` };
   }
 
   async removeRestaurant(id: number) {
@@ -152,6 +225,18 @@ export class TourismService {
     if (imageIds.length > 0) {
       await this.imageService.deleteImages(imageIds);
     }
+
+    // Remove associated translations
+    if (restaurant.translations?.length > 0) {
+      for (const translation of restaurant.translations) {
+        await this.restaurantTranslationRepo.remove(translation);
+      }
+    }
+
+    // Remove associations with department
+    restaurant.department = null;
+
+    await this.restaurantRepo.save(restaurant);
 
     // Now delete the restaurant itself
     await this.restaurantRepo.remove(restaurant);
@@ -386,6 +471,8 @@ export class TourismService {
     }
 
     historicalPlace.department = null;
+
+    await this.historicalPlaceRepo.save(historicalPlace);
 
     // Now delete the restaurant itself
     await this.historicalPlaceRepo.remove(historicalPlace);

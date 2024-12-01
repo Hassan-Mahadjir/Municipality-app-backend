@@ -36,4 +36,7 @@ export class CreateRestaurantDto {
 
   @IsArray()
   imageUrls: string[];
+
+  @IsString()
+  language: string;
 }

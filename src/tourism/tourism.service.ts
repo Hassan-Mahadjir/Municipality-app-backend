@@ -14,6 +14,8 @@ import { DepartmentService } from 'src/department/department.service';
 import { HistoricalPlace } from 'src/entities/historical-place.entity';
 import { CreateHistoricalPlaceDto } from './dto/create-historical-place';
 import { UpdateHistoricalPlaceDto } from './dto/update-historical-place';
+import { TranslationService } from 'src/translation/translation.service';
+import { HistoricalPlaceTranslation } from 'src/entities/historical-pladceTranslation.entity';
 
 @Injectable()
 export class TourismService {
@@ -24,6 +26,9 @@ export class TourismService {
     private departmentService: DepartmentService,
     @InjectRepository(HistoricalPlace)
     private historicalPlaceRepo: Repository<HistoricalPlace>,
+    private translationService: TranslationService,
+    @InjectRepository(HistoricalPlaceTranslation)
+    private historicalPlaceTransaltionRepo: Repository<HistoricalPlaceTranslation>,
   ) {}
 
   async createRestaurant(createRestaruantDto: CreateRestaurantDto) {
@@ -183,7 +188,7 @@ export class TourismService {
     }
 
     // Create the new restaurant
-    const newRestaurant = this.historicalPlaceRepo.create({
+    const newHistoricalPlace = this.historicalPlaceRepo.create({
       name: createHistoricalPlaceDto.name,
       location: createHistoricalPlaceDto.location,
       history: createHistoricalPlaceDto.history,
@@ -193,25 +198,70 @@ export class TourismService {
       closingHrWeekday: createHistoricalPlaceDto.closingHrWeekday,
       closingHrWeekend: createHistoricalPlaceDto.closingHrWeekend,
       department: department,
+      language: createHistoricalPlaceDto.language,
       images: images, // Ensure this is an array of Image entities
     });
 
     // Save the new restaurant
-    const savedRestaurant = await this.historicalPlaceRepo.save(newRestaurant);
-    return savedRestaurant;
+    const saveHistoricalPlace =
+      await this.historicalPlaceRepo.save(newHistoricalPlace);
+
+    // Step 4: Define target languages
+    const allLanguages = ['EN', 'TR']; // Example: English, Turkish
+    const sourceLang = createHistoricalPlaceDto.language; // Original language
+    const targetLanguages = allLanguages.filter((lang) => lang !== sourceLang); // Exclude original language
+
+    for (const targetLang of targetLanguages) {
+      const translatedLocation = createHistoricalPlaceDto.location
+        ? await this.translationService.translateText(
+            createHistoricalPlaceDto.location,
+            targetLang,
+          )
+        : null;
+      const translatedHistory = createHistoricalPlaceDto.history
+        ? await this.translationService.translateText(
+            createHistoricalPlaceDto.history,
+            targetLang,
+          )
+        : null;
+
+      const translatedTranslation = this.historicalPlaceTransaltionRepo.create({
+        location: translatedLocation,
+        history: translatedHistory,
+        historicalPlace: saveHistoricalPlace,
+        language: targetLang,
+      });
+
+      await this.historicalPlaceTransaltionRepo.save(translatedTranslation);
+    }
+
+    return {
+      message: 'Historical place created successfully with translations.',
+      data: saveHistoricalPlace,
+    };
   }
 
   async findAllHistoricalPlace() {
-    return await this.historicalPlaceRepo.find({
-      relations: ['images'],
+    const historicalPlaces = await this.historicalPlaceRepo.find({
+      relations: ['images', 'translations'],
     });
+
+    return {
+      message: `Successfully fetched ${historicalPlaces.length} announcements.`,
+      data: historicalPlaces,
+    };
   }
 
   async findHistoricalPlace(id: number) {
-    return await this.historicalPlaceRepo.findOne({
+    const historicalPlace = await this.historicalPlaceRepo.findOne({
       where: { id: id },
-      relations: ['images'],
+      relations: ['images', 'translations'],
     });
+
+    return {
+      message: `Successfully fetched historical place.`,
+      data: historicalPlace,
+    };
   }
 
   async updateHistoricalPlace(
@@ -220,7 +270,7 @@ export class TourismService {
   ) {
     const historicalPlace = await this.historicalPlaceRepo.findOne({
       where: { id: id },
-      relations: ['images'],
+      relations: ['images', 'translations'],
     });
 
     if (!historicalPlace) {
@@ -251,16 +301,67 @@ export class TourismService {
           historicalPlace.images.push(image);
         }
       }
+
+      // Handle translations
+      if (updateHistoricalPlace.history || historicalPlace.location) {
+        const allLanguages = ['EN', 'TR']; // Add other supported languages here
+        const sourceLang =
+          updateHistoricalPlace.language || historicalPlace.language;
+
+        const targetLanguages = allLanguages.filter(
+          (lang) => lang !== sourceLang,
+        );
+
+        for (const targetLang of targetLanguages) {
+          const existingTranslation = historicalPlace.translations.find(
+            (translation) => translation.language === targetLang,
+          );
+
+          const translatedHistory = updateHistoricalPlace.history
+            ? await this.translationService.translateText(
+                updateHistoricalPlace.history,
+                targetLang,
+              )
+            : existingTranslation?.history;
+
+          const translatedLocation = updateHistoricalPlace.location
+            ? await this.translationService.translateText(
+                updateHistoricalPlace.location,
+                targetLang,
+              )
+            : existingTranslation?.location;
+
+          if (existingTranslation) {
+            Object.assign(existingTranslation, {
+              history: translatedHistory || existingTranslation.history,
+              location: translatedLocation || existingTranslation.location,
+            });
+          } else {
+            const newTranslation = this.historicalPlaceTransaltionRepo.create({
+              history: translatedHistory || 'Translation unavailable',
+              location: translatedLocation || 'Translaiton unavailable',
+            });
+            historicalPlace.translations.push(newTranslation);
+          }
+        }
+      }
+      // Explicitly save translations
+      for (const translation of historicalPlace.translations) {
+        await this.historicalPlaceTransaltionRepo.save(translation);
+      }
     }
 
-    // Save the updated restaurant with the new images
-    return await this.historicalPlaceRepo.save(historicalPlace);
+    // Save the updated restaurant with the new images and transaltions
+    const updatedHistoricalPlace =
+      await this.historicalPlaceRepo.save(historicalPlace);
+
+    return { message: 'Historical Place has been updated successfully.' };
   }
 
   async deleteHistoricalPlace(id: number) {
     const historicalPlace = await this.historicalPlaceRepo.findOne({
       where: { id: id },
-      relations: ['images'],
+      relations: ['images', 'translations'],
     });
 
     if (!historicalPlace) {
@@ -276,6 +377,15 @@ export class TourismService {
     if (imageIds.length > 0) {
       await this.imageService.deleteImages(imageIds);
     }
+
+    // Remove associated translations
+    if (historicalPlace.translations?.length > 0) {
+      for (const translation of historicalPlace.translations) {
+        await this.historicalPlaceTransaltionRepo.remove(translation);
+      }
+    }
+
+    historicalPlace.department = null;
 
     // Now delete the restaurant itself
     await this.historicalPlaceRepo.remove(historicalPlace);

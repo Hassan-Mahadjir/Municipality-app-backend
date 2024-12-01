@@ -15,6 +15,7 @@ import { HistoricalPlace } from 'src/entities/historical-place.entity';
 import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 import { TranslationService } from 'src/translation/translation.service';
 import { departmentTranslation } from 'src/entities/departmentTranslation.entity';
+import { HistoricalPlaceTranslation } from 'src/entities/historical-pladceTranslation.entity';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { departmentTranslation } from 'src/entities/departmentTranslation.entity
       ProfileTranslation,
       HistoricalPlace,
       departmentTranslation,
+      HistoricalPlaceTranslation,
     ]),
   ],
   controllers: [TourismController],

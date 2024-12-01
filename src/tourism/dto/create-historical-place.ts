@@ -30,4 +30,7 @@ export class CreateHistoricalPlaceDto {
 
   @IsArray()
   imageUrls: string[];
+
+  @IsString()
+  language: string;
 }

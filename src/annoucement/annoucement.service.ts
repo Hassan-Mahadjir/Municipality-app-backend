@@ -254,6 +254,13 @@ export class AnnoucementService {
       await this.imageService.deleteImages(imageIds);
     }
 
+    // Remove associated translations
+    if (annoucement.translations?.length > 0) {
+      for (const translation of annoucement.translations) {
+        await this.translationRepo.remove(translation);
+      }
+    }
+
     // Remove associateions with department
     annoucement.department = null;
 

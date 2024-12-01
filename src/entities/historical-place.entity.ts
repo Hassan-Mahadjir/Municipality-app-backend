@@ -9,7 +9,7 @@ import {
 import { Department } from './department.entity';
 import { Image } from './image.entity';
 import { Comment } from './comment.entity';
-import { HistoricalPlaceTranslation } from './historical-pladceTranslations.entity';
+import { HistoricalPlaceTranslation } from './historical-pladceTranslation.entity';
 
 @Entity({ name: 'HISTORICAL PLACE' })
 export class HistoricalPlace {
@@ -39,6 +39,9 @@ export class HistoricalPlace {
 
   @Column()
   closingHrWeekend: string;
+
+  @Column()
+  language: string;
 
   // Relationship with DEPARTMENT
   @ManyToOne(() => Department, (department) => department.historicalPlaces)

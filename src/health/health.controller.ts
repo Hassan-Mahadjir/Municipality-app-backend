@@ -39,9 +39,9 @@ export class HealthController {
   @Patch('/pharmacy/:id')
   updatePharmcay(
     @Param('id') id: string,
-    @Body() UpdatePharmacyDto: UpdatePharmacyDto,
+    @Body() updatePharmacyDto: UpdatePharmacyDto,
   ) {
-    return this.healthService.updatePharmcay(+id, UpdatePharmacyDto);
+    return this.healthService.updatePharmcay(+id, updatePharmacyDto);
   }
   @Roles(Role.ADMIN, Role.STAFF) //to specify that this functionality is only valid to staff,admin
   @Delete('/pharmacy/:id')

@@ -94,12 +94,72 @@ export class HealthService {
     return {message:`Fetched succcessfully!`,data:pharmacy }
   }
   
-  async updatePharmcay(id: number, updatePharmacyDto: UpdatePharmacyDto) {
-    return this.pharmacyRepo.update({ id }, updatePharmacyDto);
+  async updatePharmcay(id: number,updatePharmacyDto: UpdatePharmacyDto) {
+    const pharmacy=await  this.pharmacyRepo.findOne({
+      where: {id},
+      relations: ['translations'],
+    });
+    if (!pharmacy){
+      throw new NotFoundException('Pharmacy not found');
+  }
+  Object.assign(pharmacy, updatePharmacyDto);
+  if(updatePharmacyDto.location){
+    // Define target languages
+    const allLanguages = ['EN', 'TR'];
+    const sourceLang = updatePharmacyDto.language || pharmacy.language;
+    const targetLanguages = allLanguages.filter(
+      (lang) => lang !== sourceLang,
+    );
+    for (const targetLang of targetLanguages){
+      let existingTranslation = pharmacy.translations.find(
+        (translation) => translation.language === targetLang,
+      );
+      const translatedLocation = updatePharmacyDto.location
+          ? await this.translationService.translateText(
+            updatePharmacyDto.location,
+              targetLang,
+            )
+          : existingTranslation?.location;
+          if (existingTranslation) {
+            // Update the existing translation
+            Object.assign(existingTranslation, {
+              location: translatedLocation,
+            });
+          }else {
+            // Create a new translation if it doesn't exist
+            existingTranslation = this.pharmacytranslationRepo.create({
+              location: translatedLocation || 'Translation unavailable',
+
+          })
+          pharmacy.translations.push(existingTranslation);
+        }
+        await this.hospitaltranslationRepo.save(existingTranslation);
+  }
+  const updatedHospital = await this.pharmacyRepo.save(pharmacy);
+
+  return { message: `The pharmacy with #ID: ${id} has been updated.` };}
   }
 
-  removePharmacy(id: number) {
-    return this.pharmacyRepo.delete(id);
+  async removePharmacy(id: number) {
+    const pharmacy= await this.pharmacyRepo.findOne({
+      where:{id},
+      relations: ['translations']
+    });
+    if (!pharmacy){
+      throw new NotFoundException('Pharmacy not found');
+  }
+  if (pharmacy.translations?.length>0){
+    for (const translation of pharmacy.translations) {
+      await this.pharmacytranslationRepo.delete(translation.id);
+  }
+}
+pharmacy.department = null;
+await this.pharmacyRepo.save(pharmacy);
+
+await this.pharmacyRepo.remove(pharmacy);
+return {
+  message: `The pharmacy with #ID: ${id} has been removed.`,
+}
   }
 
   async createHospital(createHospitalDto: CreateHospitalDto) {
@@ -172,11 +232,72 @@ export class HealthService {
     ;
   }
 
-  updateHospital(id: number, UpdateHospitalDto: UpdateHospitalDto) {
-    return this.hospitalRepo.update({ id }, UpdateHospitalDto);
+  async updateHospital(id: number, UpdateHospitalDto: UpdateHospitalDto) {
+    const hospital=await  this.hospitalRepo.findOne({
+      where: {id},
+      relations: ['translations'],
+    });
+    if (!hospital){
+      throw new NotFoundException('Hospital not found');
+  }
+  Object.assign(hospital, UpdateHospitalDto);
+  if(UpdateHospitalDto.location){
+    // Define target languages
+    const allLanguages = ['EN', 'TR'];
+    const sourceLang = UpdateHospitalDto.language || hospital.language;
+    const targetLanguages = allLanguages.filter(
+      (lang) => lang !== sourceLang,
+    );
+    for (const targetLang of targetLanguages){
+      let existingTranslation = hospital.translations.find(
+        (translation) => translation.language === targetLang,
+      );
+      const translatedLocation = UpdateHospitalDto.location
+          ? await this.translationService.translateText(
+              UpdateHospitalDto.location,
+              targetLang,
+            )
+          : existingTranslation?.location;
+          if (existingTranslation) {
+            // Update the existing translation
+            Object.assign(existingTranslation, {
+              location: translatedLocation,
+            });
+          }else {
+            // Create a new translation if it doesn't exist
+            existingTranslation = this.hospitaltranslationRepo.create({
+              location: translatedLocation || 'Translation unavailable',
+
+          })
+          hospital.translations.push(existingTranslation);
+        }
+        await this.hospitaltranslationRepo.save(existingTranslation);
+  }
+  const updatedHospital = await this.hospitalRepo.save(hospital);
+
+  return { message: `The hospital with #ID: ${id} has been updated.` };}
+
   }
 
-  removeHospital(id: number) {
-    return this.hospitalRepo.delete(id);
+  async removeHospital(id: number) {
+    const hospital= await this.hospitalRepo.findOne({
+      where:{id},
+      relations: ['translations']
+    });
+    if (!hospital){
+      throw new NotFoundException('Hospital not found');
+  }
+  if (hospital.translations?.length>0){
+    for (const translation of hospital.translations) {
+      await this.hospitaltranslationRepo.delete(translation.id);
   }
 }
+hospital.department = null;
+await this.hospitalRepo.save(hospital);
+
+await this.hospitalRepo.remove(hospital);
+return {
+  message: `The Hospital with #ID: ${id} has been removed.`,
+}
+  }}
+

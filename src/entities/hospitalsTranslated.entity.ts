@@ -21,14 +21,13 @@ export class HospitalTranslated {
   @Column()
   location: string;
 
-  @Column({ nullable: true })
-  imageUrl: string;
+ 
 
 
   @Column()
   language: string;
 
   // Relationship with DEPARTMENT
-  @OneToMany(() => Hospital, (Hospital) => Hospital.translations)
-  hospital: Hospital[];
+  @ManyToOne(() => Hospital, (hospital) => hospital.translations)
+  hospital: Hospital;
 }

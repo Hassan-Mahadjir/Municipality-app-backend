@@ -64,6 +64,7 @@ export class HealthService {
       const translatedTranslation = this.pharmacytranslationRepo.create({
         location: translatedLocation || 'Translation unaialable',
         language: targetLang, // Store the translated language, // Link to the original announcement
+        pharmacy: newPharmacy,
       });
 
       await this.pharmacytranslationRepo.save(translatedTranslation);
@@ -74,17 +75,23 @@ export class HealthService {
     };
   }
 
-  findAllPharmacy() {
-    return this.pharmacyRepo.find();
+  async findAllPharmacy() {
+    const pharmacies=await  this.pharmacyRepo.find({relations:['translations']});
+    return {message:`${pharmacies.length}pharmacies fetched succcessfully!`,data:pharmacies }
+
   }
 
-  findOnePharmacy(id: number) {
-    return this.pharmacyRepo.findOne({
+  async findOnePharmacy(id: number) {
+    const pharmacy= await this.pharmacyRepo.findOne({
       where: {
         id: id,
       },
       relations: ['translations'], 
     });
+    if (!pharmacy){
+      throw new NotFoundException('Pharmacy not found');
+    }
+    return {message:`Fetched succcessfully!`,data:pharmacy }
   }
   
   async updatePharmcay(id: number, updatePharmacyDto: UpdatePharmacyDto) {
@@ -113,7 +120,9 @@ export class HealthService {
       ...createHospitalDto,
       department: department,
     });
-  
+      // Save the new hospital after translations
+      const savedHospital = await this.hospitalRepo.save(newHospital);
+
     // Handle translation logic before saving the hospital
     const allLanguages = ['EN', 'TR']; // Example: English, Turkish
     const sourceLang = createHospitalDto.language; // Original language
@@ -128,14 +137,14 @@ export class HealthService {
         : null;
       const translatedTranslation = this.hospitaltranslationRepo.create({
         location: translatedLocation || 'Translation unavailable',
-        language: targetLang, // Store the translated language
+        language: targetLang, // Store the translated language,
+        hospital: newHospital,
       });
   
       await this.hospitaltranslationRepo.save(translatedTranslation);
     }
   
-    // Save the new hospital after translations
-    const savedHospital = await this.hospitalRepo.save(newHospital);
+
   
     return {
       message: 'Hospital created successfully with translations.',
@@ -144,16 +153,23 @@ export class HealthService {
   }
   
 
-  findAllHospital() {
-    return this.hospitalRepo.find();
+  async findAllHospital() {
+    const hospitals= await this.hospitalRepo.find({relations:['translations']});
+    return {message:`${hospitals.length} hospitals fetched succcessfully!`,data:hospitals }
   }
 
-  findOneHospital(id: number) {
-    return this.hospitalRepo.findOne({
+  async findOneHospital(id: number) {
+    const hospital= await this.hospitalRepo.findOne({
       where: {
         id: id,
       },
+      relations: ['translations'], 
     });
+    if (!hospital){
+      throw new NotFoundException('Hospital not found');
+    }
+    return {message:`Fetched succcessfully!`,data:hospital }
+    ;
   }
 
   updateHospital(id: number, UpdateHospitalDto: UpdateHospitalDto) {

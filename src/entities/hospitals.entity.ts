@@ -3,6 +3,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -34,9 +35,10 @@ export class Hospital {
   @ManyToOne(() => Department, (department) => department.hospitals)
   @JoinColumn({ name: 'departmentId' })
   department: Department;
-  @ManyToOne(
+
+  @OneToMany(
     () => HospitalTranslated,
-    (HospitalTranslated) => HospitalTranslated.hospital,
+    (hospitalTranslated) => hospitalTranslated.hospital,
   )
   @JoinColumn({ name: 'translationid' })
   translations: HospitalTranslated[];

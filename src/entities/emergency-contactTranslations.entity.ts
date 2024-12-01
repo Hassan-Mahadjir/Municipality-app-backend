@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { EmergencyContact } from './emergency-contact.entity';
 
-@Entity({ name: 'EMERGENCY' })
+@Entity({ name: 'EMERGENCY_TRANSLSATION' })
 export class EmergencyContactTranslation {
   @PrimaryGeneratedColumn()
   id: number;

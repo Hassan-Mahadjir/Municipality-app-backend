@@ -254,6 +254,9 @@ export class AnnoucementService {
       await this.imageService.deleteImages(imageIds);
     }
 
+    // Remove associateions with department
+    annoucement.department = null;
+
     await this.annoucementRepo.remove(annoucement);
 
     return {

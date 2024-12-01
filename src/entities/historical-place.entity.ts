@@ -9,6 +9,7 @@ import {
 import { Department } from './department.entity';
 import { Image } from './image.entity';
 import { Comment } from './comment.entity';
+import { HistoricalPlaceTranslation } from './historical-pladceTranslations.entity';
 
 @Entity({ name: 'HISTORICAL PLACE' })
 export class HistoricalPlace {
@@ -52,4 +53,12 @@ export class HistoricalPlace {
   // Relationship with COMMENT
   @OneToMany(() => Comment, (comment) => comment.historicalPlace)
   historicalPlaceComments: Comment[];
+
+  // Translations Table
+  @OneToMany(
+    () => HistoricalPlaceTranslation,
+    (translation) => translation.historicalPlace,
+  )
+  @JoinColumn({ name: 'translationId' })
+  translations: HistoricalPlaceTranslation[];
 }

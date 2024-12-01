@@ -20,6 +20,7 @@ import { ProfileTranslation } from 'src/entities/profileTranslation.entity';
 import { TranslationService } from 'src/translation/translation.service';
 import { departmentTranslation } from 'src/entities/departmentTranslation.entity';
 import { EmergencyContactTranslation } from 'src/entities/emergency-contactTranslations.entity';
+import { HistoricalPlaceTranslation } from 'src/entities/historical-pladceTranslations.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -36,6 +37,7 @@ import { EmergencyContactTranslation } from 'src/entities/emergency-contactTrans
       DisasterPoint,
       departmentTranslation,
       EmergencyContactTranslation,
+      HistoricalPlaceTranslation,
     ]),
   ],
   controllers: [CommunityController],

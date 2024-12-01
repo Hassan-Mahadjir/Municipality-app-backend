@@ -88,10 +88,11 @@ export class CommunityService {
 
     const newContact = this.emergencyRepo.create({
       ...createEmergencyContactDto,
+      language: createEmergencyContactDto.language,
       department: department,
     });
 
-    const newContactInfo = this.emergencyRepo.save(newContact);
+    const newContactInfo = await this.emergencyRepo.save(newContact);
 
     // Step 4: Define target languages
     const allLanguages = ['EN', 'TR']; // Example: English, Turkish
@@ -105,28 +106,106 @@ export class CommunityService {
             targetLang,
           )
         : null;
+
+      const translatedTranslation = this.emergencyTranslationsReppo.create({
+        name: translatedName,
+        language: targetLang,
+        emergencyContact: newContact,
+      });
+
+      await this.emergencyTranslationsReppo.save(translatedTranslation);
     }
+
+    return {
+      message: 'Emergency contact has been created successfullly.',
+      data: newContactInfo,
+    };
   }
 
   async findAllEmergencyContacts() {
-    return await this.emergencyRepo.find();
+    const emergencyContacts = await this.emergencyRepo.find({
+      relations: ['translations'],
+    });
+    return {
+      messsage: `${emergencyContacts.length} has been fetched succcessfully.`,
+      data: emergencyContacts,
+    };
   }
 
   async findOneEmergencyContact(id: number) {
-    const contactInfo = await this.emergencyRepo.findOne({ where: { id: id } });
+    const contactInfo = await this.emergencyRepo.findOne({
+      where: { id: id },
+      relations: ['translations'],
+    });
     if (!contactInfo)
       throw new NotFoundException(
         `The emergenecy contact with ID:${id} does not exit.`,
       );
 
-    return contactInfo;
+    return {
+      message: `Emergency contact info has been fetched successfully.`,
+      data: contactInfo,
+    };
   }
 
   async updateEmergencyContact(
     id: number,
     updateEmergencyContactDto: UpdateEmergencyContactDto,
   ) {
-    await this.emergencyRepo.update({ id: id }, updateEmergencyContactDto);
+    const emergencyContact = await this.emergencyRepo.findOne({
+      where: { id: id },
+      relations: ['translations'],
+    });
+    if (!emergencyContact)
+      throw new NotFoundException(
+        `The Emergency contact with ID:${id} does not exist.`,
+      );
+
+    Object.assign(emergencyContact, updateEmergencyContactDto);
+
+    if (updateEmergencyContactDto.name) {
+      const allLanguages = ['EN', 'TR']; // Add other supported languages here
+      const sourceLang =
+        updateEmergencyContactDto.language || emergencyContact.language;
+
+      const targetLanguages = allLanguages.filter(
+        (lang) => lang !== sourceLang,
+      );
+
+      for (const targetLang of targetLanguages) {
+        const existingTranslation = emergencyContact.translations.find(
+          (translation) => translation.language === targetLang,
+        );
+
+        const translatedName = updateEmergencyContactDto.name
+          ? await this.translationService.translateText(
+              updateEmergencyContactDto.name,
+              targetLang,
+            )
+          : existingTranslation.name;
+
+        if (existingTranslation) {
+          Object.assign(existingTranslation, {
+            name: translatedName || existingTranslation.name,
+          });
+        } else {
+          const newTranslation = this.emergencyTranslationsReppo.create({
+            name: translatedName || 'Translations unavailable',
+            language: targetLang,
+            emergencyContact: emergencyContact,
+          });
+
+          emergencyContact.translations.push(newTranslation);
+        }
+      }
+
+      for (const translation of emergencyContact.translations) {
+        await this.emergencyTranslationsReppo.save(translation);
+      }
+    }
+
+    const updateEmergencyContact =
+      await this.emergencyRepo.save(emergencyContact);
     return {
       message: `The emergency contacted with ID:${id} has been updated successfully.`,
     };
@@ -135,16 +214,24 @@ export class CommunityService {
   async removeEmergencyContact(id: number) {
     const emergencyContact = await this.emergencyRepo.findOne({
       where: { id: id },
+      relations: ['translations'],
     });
     if (!emergencyContact)
       throw new NotFoundException(
         `The Emergency contact with ID:${id} does not exist.`,
       );
 
+    if (emergencyContact.translations.length > 0) {
+      for (const translation of emergencyContact.translations) {
+        await this.emergencyTranslationsReppo.remove(translation);
+      }
+    }
+    emergencyContact.department = null;
+
     await this.emergencyRepo.remove(emergencyContact);
 
     return {
-      message: `Emergency contact with ID:${id} have been removed.`,
+      message: `Emergency contact with ID:${id} have been removed successfully.`,
     };
   }
 

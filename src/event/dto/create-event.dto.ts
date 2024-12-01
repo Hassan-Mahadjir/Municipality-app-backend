@@ -27,4 +27,6 @@ export class CreateEventDto {
 
   @IsArray()
   imageUrls: string[];
+  @IsString()
+  language:string;
 }

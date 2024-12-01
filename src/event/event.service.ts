@@ -15,8 +15,7 @@ export class EventService {
     private departmentService: DepartmentService,
     @InjectRepository(Event) private eventRepo: Repository<Event>,
     private imageService: ImageService,
-    @InjectRepository(eventTranslated) private eventTranslatedRepo: Repository<eventTranslated>,
-    private translationRepo: Repository<eventTranslated>,
+    @InjectRepository(eventTranslated) private translationRepo: Repository<eventTranslated>,
     private translationService: TranslationService,
   ) {}
   async create(createEventDto: CreateEventDto) {
@@ -47,6 +46,7 @@ export class EventService {
       department: department,
       location: createEventDto.location,
       category: createEventDto.category,
+      language: createEventDto.language
     });
     const savedEvent= await this.eventRepo.save(newEvent);
     const allLanguages = ['EN', 'TR']; // Example: English, Turkish
@@ -75,6 +75,10 @@ export class EventService {
         createEventDto.category,
         targetLang,
       );
+      const translatedlang = await this.translationService.translateText(
+        createEventDto.language,
+        targetLang,
+      );
 
       // Step 6: Save each translation
       const translatedTranslation = this.translationRepo.create({
@@ -82,6 +86,7 @@ export class EventService {
         header: translatedHeader || 'Translation unavailable',
         description: translatedDescription || 'Translation unavailable',
         location: translatedLocation || 'Translation unaialable',
+        category: translatedCategory || 'Translation unavailable',
         language: targetLang, // Store the translated language
         event: savedEvent, // Link to the original 
       });
@@ -122,7 +127,7 @@ export class EventService {
   async update(id: number, updateEventDto: UpdateEventDto) {
     const event = await this.eventRepo.findOne({
       where: { id: id },
-      relations: ['images'],
+      relations: ['images','translations'],
     });
 
     if (!event)
@@ -146,17 +151,98 @@ export class EventService {
         }
       }
     }
-    await this.eventRepo.save(event);
+    if (
+      updateEventDto.title||
+      updateEventDto.description ||
+      updateEventDto.category||
+      updateEventDto.header||
+      updateEventDto.location
+    ){
+      const allLanguages = ['EN', 'TR']; // Add other supported languages here
+      const sourceLang =updateEventDto.language|| event.language;
+      const targetLanguages= allLanguages.filter(
+        (lang) => lang !== sourceLang,
+      );
+      for (const targetLang of targetLanguages) {
+        const existingTranslation = event.translations.find(
+          (translation) => translation.language === targetLang,
+        );
 
-    return {
-      message: `Event with ID: ${id} and its images have been updated`,
-    };
+        const translatedTitle = updateEventDto.title
+          ? await this.translationService.translateText(
+              updateEventDto.title,
+              targetLang,
+            )
+          : existingTranslation?.title;
+
+        const translatedHeader = updateEventDto.header
+          ? await this.translationService.translateText(
+              updateEventDto.header,
+              targetLang,
+            )
+          : existingTranslation?.header;
+
+        const translatedDescription = updateEventDto.description
+          ? await this.translationService.translateText(
+              updateEventDto.description,
+              targetLang,
+            )
+          : existingTranslation?.description;
+
+        const translatedLocation = updateEventDto.location
+          ? await this.translationService.translateText(
+              updateEventDto.location,
+              targetLang,
+            )
+          : existingTranslation?.location;
+
+          const translatedCategory = updateEventDto.category
+          ? await this.translationService.translateText(
+              updateEventDto.category,
+              targetLang,
+            )
+          : existingTranslation?.category;
+
+        if (existingTranslation) {
+          Object.assign(existingTranslation, {
+            title: translatedTitle || existingTranslation.title,
+            header: translatedHeader || existingTranslation.header,
+            description: translatedDescription || existingTranslation.description,
+            location: translatedLocation || existingTranslation.location,
+            category: translatedCategory || existingTranslation.category,
+          });
+        } else {
+          const newTranslation = this.translationRepo.create({
+            title: translatedTitle || 'Translation unavailable',
+            header: translatedHeader || 'Translation unavailable',
+            description: translatedDescription || 'Translation unavailable',
+            location: translatedLocation || 'Translation unavailable',
+            category: translatedCategory || 'Translation unavailable',
+            language: targetLang,
+            event,
+          });
+          event.translations.push(newTranslation);
+        }
+      }
+    }
+    
+
+    for (const translation of event.translations) {
+      await this.translationRepo.save(translation);
+    }
+  
+
+  // Save the updated announcement
+  const updatedEvent = await this.eventRepo.save(event);
+  console.log('Updated Event:', updatedEvent);
+  return updatedEvent;
+
   }
 
   async remove(id: number) {
     const event = await this.eventRepo.findOne({
       where: { id: id },
-      relations: ['images'],
+      relations: ['images','translations'],
     });
 
     if (!event)
@@ -166,6 +252,19 @@ export class EventService {
     if (imageIds.length > 0) {
       await this.imageService.deleteImages(imageIds);
     }
+    // Remove associated translations
+    if (event.translations?.length > 0) {
+      for (const translation of event.translations) {
+        await this.translationRepo.remove(translation);
+      }
+    }
+
+    // Remove associations with user and department
+   
+    event.department = null;
+
+    // Save changes to clear associations
+    await this.eventRepo.save(event);
 
     await this.eventRepo.remove(event);
 

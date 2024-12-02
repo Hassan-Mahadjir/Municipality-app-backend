@@ -16,6 +16,9 @@ export class CreateWasteSechduleDto {
   @IsString()
   wasteType: string;
 
+  @IsString()
+  language: string;
+
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => DaySchedule)

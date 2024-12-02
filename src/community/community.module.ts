@@ -23,6 +23,8 @@ import { EmergencyContactTranslation } from 'src/entities/emergency-contactTrans
 import { HistoricalPlaceTranslation } from 'src/entities/historical-pladceTranslation.entity';
 import { AnimalTranslation } from 'src/entities/animalTranslation.entity';
 import { AnimalShelterTranslation } from 'src/entities/shelterTranslations.entity';
+import { WasteSechduleTranslation } from 'src/entities/wasteSechduleTranslation.entity';
+import { WasteTypeTranslation } from 'src/entities/waste-typeTranslation.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -41,6 +43,8 @@ import { AnimalShelterTranslation } from 'src/entities/shelterTranslations.entit
       EmergencyContactTranslation,
       AnimalTranslation,
       AnimalShelterTranslation,
+      WasteTypeTranslation,
+      WasteSechduleTranslation,
     ]),
   ],
   controllers: [CommunityController],

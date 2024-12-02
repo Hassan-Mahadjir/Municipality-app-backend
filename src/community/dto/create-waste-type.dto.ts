@@ -5,5 +5,8 @@ export class CreateWasteTypeDto {
   type: string;
 
   @IsString()
+  language: string;
+
+  @IsString()
   departmentName: string;
 }

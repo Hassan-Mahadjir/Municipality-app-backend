@@ -36,6 +36,8 @@ import { TranslationService } from 'src/translation/translation.service';
 import { EmergencyContactTranslation } from 'src/entities/emergency-contactTranslations.entity';
 import { AnimalTranslation } from 'src/entities/animalTranslation.entity';
 import { AnimalShelterTranslation } from 'src/entities/shelterTranslations.entity';
+import { WasteSechduleTranslation } from 'src/entities/wasteSechduleTranslation.entity';
+import { WasteTypeTranslation } from 'src/entities/waste-typeTranslation.entity';
 
 @Injectable()
 export class CommunityService {
@@ -60,6 +62,10 @@ export class CommunityService {
     private animalTranslationRepo: Repository<AnimalTranslation>,
     @InjectRepository(AnimalShelterTranslation)
     private animalShelterTranslationRepo: Repository<AnimalShelterTranslation>,
+    @InjectRepository(WasteSechduleTranslation)
+    private wasteSechduleTranslationRepo: Repository<WasteSechduleTranslation>,
+    @InjectRepository(WasteTypeTranslation)
+    private wasteTypeTranslationRepo: Repository<WasteTypeTranslation>,
   ) {}
   async createEmergencyContact(
     createEmergencyContactDto: CreateEmergencyContactDto,
@@ -265,14 +271,90 @@ export class CommunityService {
 
     const newType = await this.wasteTypeRepo.create({
       type: createWasteTypeDto.type,
+      language: createWasteTypeDto.language,
       department: department,
     });
 
-    return this.wasteTypeRepo.save(newType);
+    const savedType = await this.wasteTypeRepo.save(newType);
+
+    // Define target languages
+    const allLanguages = ['EN', 'TR'];
+    const sourceLang = createWasteTypeDto.language;
+    const targetLanguages = allLanguages.filter((lang) => lang !== sourceLang);
+
+    // Create translations for target languages
+    for (const targetLang of targetLanguages) {
+      const translatedType = createWasteTypeDto.type
+        ? await this.translationService.translateText(
+            createWasteTypeDto.type,
+            targetLang,
+          )
+        : null;
+
+      const translatedTranslation = await this.wasteTypeTranslationRepo.create({
+        type: translatedType,
+        language: targetLang,
+        wasteType: savedType,
+      });
+
+      await this.wasteTypeTranslationRepo.save(translatedTranslation);
+    }
+
+    return {
+      message: `Waste type has been created successfully.`,
+      data: savedType,
+    };
   }
 
   async modifyWasteType(id: number, updateWasteTypeDto: UpdateWasteTypeDto) {
-    return this.wasteTypeRepo.update({ id: id }, updateWasteTypeDto);
+    const wasteType = await this.wasteTypeRepo.findOne({
+      where: { id: id },
+      relations: ['translations'],
+    });
+    if (!wasteType)
+      throw new NotFoundException(
+        `The waste type with #ID:${id} does not exist.`,
+      );
+
+    Object.assign(wasteType, updateWasteTypeDto);
+
+    if (updateWasteTypeDto.type) {
+      const allLanguages = ['EN', 'TR'];
+      const sourceLang = updateWasteTypeDto.language || wasteType.language;
+      const targetLanguages = allLanguages.filter(
+        (lang) => lang !== sourceLang,
+      );
+
+      for (const targetLang of targetLanguages) {
+        let existingTranslation = wasteType.translations.find(
+          (translation) => translation.language === targetLang,
+        );
+
+        const translatedType = await this.translationService.translateText(
+          updateWasteTypeDto.type,
+          targetLang,
+        );
+
+        if (existingTranslation) {
+          Object.assign(existingTranslation, { type: translatedType });
+          await this.wasteTypeTranslationRepo.save(existingTranslation);
+        } else {
+          const newTranslation = this.wasteTypeTranslationRepo.create({
+            type: translatedType || 'Translation unavailable',
+            language: targetLang,
+            wasteType: wasteType,
+          });
+          await this.wasteTypeTranslationRepo.save(newTranslation);
+          wasteType.translations.push(newTranslation); // Optional: maintain local consistency
+        }
+      }
+    }
+
+    const updatedWasteType = await this.wasteTypeRepo.save(wasteType);
+
+    return {
+      message: `The waste type with #ID ${id} has been updated successfully.`,
+    };
   }
 
   async createWasteSechdule(createWasteSechduleDto: CreateWasteSechduleDto) {
@@ -303,12 +385,33 @@ export class CommunityService {
         startTime: item.startTime,
         endTime: item.endTime,
         wasteType: type,
+        language: createWasteSechduleDto.language,
       });
 
-      await this.wasteSechduleRepo.save(newSechdule);
+      const savedSechdule = await this.wasteSechduleRepo.save(newSechdule);
+      // Define target languages
+      const allLanguages = ['EN', 'TR'];
+      const sourceLang = createWasteSechduleDto.language;
+      const targetLanguages = allLanguages.filter(
+        (lang) => lang !== sourceLang,
+      );
+
+      // Create translations for target languages
+      for (const targetLang of targetLanguages) {
+        const translatedDay = item.day
+          ? await this.translationService.translateText(item.day, targetLang)
+          : null;
+        const translatedTranslation = this.wasteSechduleTranslationRepo.create({
+          day: translatedDay,
+          language: targetLang,
+          wasteSechdule: savedSechdule,
+        });
+
+        await this.wasteSechduleTranslationRepo.save(translatedTranslation);
+      }
     }
 
-    return { message: `The schedules have been created.` };
+    return { message: `The schedules have been created successfully.` };
   }
 
   async updateWasteSechdule(
@@ -335,28 +438,57 @@ export class CommunityService {
       throw new BadRequestException('No days provided to update.');
     }
 
+    // Delete existing schedules for the given wasteType
+    const existingSchedules = await this.wasteSechduleRepo.find({
+      where: { wasteType: { id } },
+      relations: ['translations'],
+    });
+
+    for (const existingSchedule of existingSchedules) {
+      // Delete associated translations first
+      await this.wasteSechduleTranslationRepo.remove(
+        existingSchedule.translations,
+      );
+
+      await this.wasteSechduleRepo.remove(existingSchedule); // Delete the existing schedule
+    }
+
+    // Create new schedules
     for (const daySchedule of updateWasteSechduleDto.days) {
-      // Check if the schedule for the day already exists
-      const existingSchedule = await this.wasteSechduleRepo.findOne({
-        where: { day: daySchedule.day, wasteType: { id } },
+      const newSechdule = this.wasteSechduleRepo.create({
+        day: daySchedule.day,
+        startTime: daySchedule.startTime,
+        endTime: daySchedule.endTime,
+        language: updateWasteSechduleDto.language || 'EN',
+        wasteType: await this.wasteTypeRepo.findOne({
+          where: { type: updateWasteSechduleDto.wasteType },
+        }),
       });
 
-      if (existingSchedule) {
-        // Update the existing schedule
-        existingSchedule.startTime = daySchedule.startTime;
-        existingSchedule.endTime = daySchedule.endTime;
-        await this.wasteSechduleRepo.save(existingSchedule);
-      } else {
-        // Create a new schedule entry if it doesn't exist
-        const newSechdule = this.wasteSechduleRepo.create({
-          day: daySchedule.day,
-          startTime: daySchedule.startTime,
-          endTime: daySchedule.endTime,
-          wasteType: await this.wasteTypeRepo.findOne({
-            where: { type: updateWasteSechduleDto.wasteType },
-          }),
+      const newSavedSechdule = await this.wasteSechduleRepo.save(newSechdule);
+
+      // Assuming you have predefined languages
+      const allLanguages = ['EN', 'TR'];
+      const sourceLang = updateWasteSechduleDto.language || 'EN';
+      const targetLanguages = allLanguages.filter(
+        (lang) => lang !== sourceLang,
+      );
+
+      for (const targetLang of targetLanguages) {
+        const translatedDay = daySchedule.day
+          ? await this.translationService.translateText(
+              daySchedule.day,
+              targetLang,
+            )
+          : daySchedule.day;
+
+        const newTranslation = this.wasteSechduleTranslationRepo.create({
+          day: translatedDay,
+          language: targetLang,
+          wasteSechdule: newSavedSechdule,
         });
-        await this.wasteSechduleRepo.save(newSechdule);
+
+        await this.wasteSechduleTranslationRepo.save(newTranslation);
       }
     }
 
@@ -364,25 +496,35 @@ export class CommunityService {
   }
 
   async deleteWasteType(id: number) {
-    // Find the WasteType by ID
+    // Find the WasteType by ID, including related schedules and translations
     const wasteType = await this.wasteTypeRepo.findOne({
       where: { id },
-      relations: ['sechdules'], // Load associated WasteSechdule entities
+      relations: ['sechdules', 'sechdules.translations', 'translations'], // Load schedules with translations
     });
 
     if (!wasteType) {
       throw new NotFoundException(`Waste type with ID '${id}' not found.`);
     }
 
-    // Remove associations in WasteSechdule before deleting the WasteType
+    // Remove associated translations for each schedule
     if (wasteType.sechdules.length > 0) {
       for (const sechdule of wasteType.sechdules) {
-        sechdule.wasteType = null; // Remove association
-        await this.wasteSechduleRepo.save(sechdule); // Update in the database
+        // Delete associated translations first
+        if (sechdule.translations && sechdule.translations.length > 0) {
+          await this.wasteSechduleTranslationRepo.remove(sechdule.translations); // Delete translations first
+        }
+
+        // Now delete the schedule itself
+        await this.wasteSechduleRepo.remove(sechdule);
       }
     }
 
-    // Now, delete the WasteType
+    // Remove associated translations for the WasteType itself (if any)
+    if (wasteType.translations && wasteType.translations.length > 0) {
+      await this.wasteTypeTranslationRepo.remove(wasteType.translations);
+    }
+
+    // Finally, delete the WasteType
     await this.wasteTypeRepo.delete(id);
 
     return {

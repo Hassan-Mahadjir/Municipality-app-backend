@@ -35,6 +35,7 @@ import { UpdateDisasterPointDto } from './dto/update-disaster-point.dto';
 import { TranslationService } from 'src/translation/translation.service';
 import { EmergencyContactTranslation } from 'src/entities/emergency-contactTranslations.entity';
 import { AnimalTranslation } from 'src/entities/animalTranslation.entity';
+import { AnimalShelterTranslation } from 'src/entities/shelterTranslations.entity';
 
 @Injectable()
 export class CommunityService {
@@ -57,6 +58,8 @@ export class CommunityService {
     private emergencyTranslationsReppo: Repository<EmergencyContactTranslation>,
     @InjectRepository(AnimalTranslation)
     private animalTranslationRepo: Repository<AnimalTranslation>,
+    @InjectRepository(AnimalShelterTranslation)
+    private animalShelterTranslationRepo: Repository<AnimalShelterTranslation>,
   ) {}
   async createEmergencyContact(
     createEmergencyContactDto: CreateEmergencyContactDto,
@@ -483,25 +486,33 @@ export class CommunityService {
   async findAinmalReport(id: number) {
     const animalReport = await this.animalRepo.findOne({
       where: { id: id },
-      relations: ['department', 'user.profile', 'images'],
+      relations: ['department', 'user.profile', 'images', 'translations'],
     });
 
     if (!animalReport)
       throw new NotFoundException(`The Animal with ${id} does not exist.`);
 
-    return animalReport;
+    return {
+      message: `Animal report has been fetched successfully.`,
+      data: animalReport,
+    };
   }
 
   async findAllAnimalReport() {
-    return await this.animalRepo.find({
-      relations: ['department', 'user.profile', 'images'],
+    const allAnimalReport = await this.animalRepo.find({
+      relations: ['department', 'user.profile', 'images', 'translations'],
     });
+
+    return {
+      messsage: `Successfully fetched ${allAnimalReport.length} animal reports.`,
+      data: allAnimalReport,
+    };
   }
 
   async updateAnimalReport(id: number, updateAnimalDto: UpdateAnimalDto) {
     const animalReport = await this.animalRepo.findOne({
       where: { id: id },
-      relations: ['department', 'user.profile', 'images'],
+      relations: ['department', 'user.profile', 'images', 'translations'],
     });
 
     if (!animalReport) {
@@ -549,18 +560,90 @@ export class CommunityService {
     // Merge updateAnimalDto properties into the existing animalReport object
     Object.assign(animalReport, updateAnimalDto);
 
+    if (
+      updateAnimalDto.description ||
+      updateAnimalDto.location ||
+      updateAnimalDto.status ||
+      updateAnimalDto.title
+    ) {
+      // Define target languages
+      const allLanguages = ['EN', 'TR'];
+      const sourceLang = updateAnimalDto.language || animalReport.language;
+      const targetLanguages = allLanguages.filter(
+        (lang) => lang !== sourceLang,
+      );
+
+      for (const targetLang of targetLanguages) {
+        let existingTranslation = animalReport.translations.find(
+          (translation) => translation.language === targetLang,
+        );
+
+        // Translate fields if provided in the update DTO
+        const translatedTitle = updateAnimalDto.title
+          ? await this.translationService.translateText(
+              updateAnimalDto.title,
+              targetLang,
+            )
+          : existingTranslation.title;
+        const translatedLocation = updateAnimalDto.location
+          ? await this.translationService.translateText(
+              updateAnimalDto.location,
+              targetLang,
+            )
+          : existingTranslation.location;
+        const translatedDescription = updateAnimalDto.description
+          ? await this.translationService.translateText(
+              updateAnimalDto.description,
+              targetLang,
+            )
+          : existingTranslation.description;
+
+        const translatedStatus = updateAnimalDto.status
+          ? await this.translationService.translateText(
+              updateAnimalDto.status,
+              targetLang,
+            )
+          : existingTranslation?.status;
+
+        if (existingTranslation) {
+          // Update the existing translation
+          Object.assign(existingTranslation, {
+            title: translatedTitle,
+            description: translatedDescription,
+            status: translatedStatus,
+            location: translatedLocation,
+          });
+        } else {
+          // create a new translation if doesn't exist
+          existingTranslation = this.animalTranslationRepo.create({
+            title: translatedTitle || 'Translations unavailable',
+            location: translatedLocation || 'Translations unavailable',
+            description: translatedDescription || `Transaltion unavailable`,
+            status: translatedStatus || 'Translation unavailable',
+            language: targetLang,
+            animal: animalReport,
+          });
+
+          animalReport.translations.push(existingTranslation);
+        }
+
+        // Save the translation
+        await this.animalTranslationRepo.save(existingTranslation);
+      }
+    }
+
     // Save the updated animalReport entity with new images
-    await this.animalRepo.save(animalReport);
+    const updatedAnimalReport = await this.animalRepo.save(animalReport);
 
     return {
-      message: `The Animal report with ID: ${id} has been updated successfully, including images.`,
+      message: `The Animal report with ID: ${id} has been updated successfully.`,
     };
   }
 
   async deleteAnimalReport(id: number) {
     const animalReport = await this.animalRepo.findOne({
       where: { id: id },
-      relations: ['department', 'user.profile', 'images'], // Include images in relations
+      relations: ['department', 'user.profile', 'images', 'translations'], // Include images in relations
     });
 
     if (!animalReport) {
@@ -575,14 +658,22 @@ export class CommunityService {
       await this.imageService.deleteImages(imageIds);
     }
 
-    // Remove the association with department and user by setting them to null
-    await this.animalRepo.update(id, {
-      department: null,
-      user: null,
-    });
+    // Remove associated translations
+    if (animalReport.translations?.length > 0) {
+      for (const translation of animalReport.translations) {
+        await this.animalTranslationRepo.remove(translation);
+      }
+    }
 
-    // Now delete the animal report itself
-    await this.animalRepo.delete(id);
+    // Remove the association with department and user by setting them to null
+    animalReport.department = null;
+    animalReport.user = null;
+
+    // Save changes to clear associations
+    await this.animalRepo.save(animalReport);
+
+    // Now remove the animal report itself
+    await this.animalRepo.remove(animalReport);
 
     return {
       message: `The Animal report with ID: ${id} and its associated images have been deleted successfully.`,
@@ -608,18 +699,61 @@ export class CommunityService {
       department: department,
     });
 
-    return this.animalShelterRepo.save(newShelter);
+    const savedShelter = await this.animalShelterRepo.save(newShelter);
+    // Define target languages
+    const allLanguages = ['EN', 'TR'];
+    const sourceLang = createAnimalShelterDto.language;
+    const targetLanguages = allLanguages.filter((lang) => lang !== sourceLang);
+
+    // Create translations for target languages
+    for (const targetLang of targetLanguages) {
+      const translatedLocation = createAnimalShelterDto.location
+        ? await this.translationService.translateText(
+            createAnimalShelterDto.location,
+            targetLang,
+          )
+        : null;
+
+      const translatedTranslation = this.animalShelterTranslationRepo.create({
+        location: translatedLocation,
+        language: targetLang,
+        animalShelter: savedShelter,
+      });
+
+      await this.animalShelterTranslationRepo.save(translatedTranslation);
+    }
+
+    return {
+      message: `Shelter has been created successfully.`,
+      data: savedShelter,
+    };
   }
 
   async findAllAnimalShelters() {
-    return await this.animalShelterRepo.find({ relations: ['department'] });
+    const animalShelters = await this.animalShelterRepo.find({
+      relations: ['department', 'translations'],
+    });
+    return {
+      message: `Successflly fetched ${animalShelters.length} animal shelters`,
+      data: animalShelters,
+    };
   }
 
   async findAnimalShelter(id: number) {
-    return await this.animalShelterRepo.findOne({
+    const animalShelter = await this.animalShelterRepo.findOne({
       where: { id: id },
-      relations: ['department'],
+      relations: ['department', 'translations'],
     });
+
+    if (!animalShelter)
+      throw new NotFoundException(
+        `The shelter with #ID: ${id} does not exist.`,
+      );
+
+    return {
+      message: 'Shelter has been fetched successfully',
+      data: animalShelter,
+    };
   }
 
   async updateAnimalShelter(
@@ -628,16 +762,85 @@ export class CommunityService {
   ) {
     const animalShelter = await this.animalShelterRepo.findOne({
       where: { id: id },
+      relations: ['department', 'translations'],
     });
 
     if (!animalShelter)
       throw new NotFoundException(`The shelter with ID:${id} does not exist.`);
 
-    return this.animalShelterRepo.update({ id }, updateAnimalShelter);
+    // Update shelter fields
+    Object.assign(animalShelter, updateAnimalShelter);
+
+    // Handle Translations
+    if (updateAnimalShelter.location) {
+      // Define target languages
+      const allLanguages = ['EN', 'TR'];
+      const sourceLang = updateAnimalShelter.language || animalShelter.language;
+      const targetLanguages = allLanguages.filter(
+        (lang) => lang !== sourceLang,
+      );
+
+      for (const targetLang of targetLanguages) {
+        let existingTranslation = animalShelter.translations.find(
+          (translation) => translation.language === targetLang,
+        );
+
+        // Translate fields if provided in the update DTO
+        const translatedLocation = updateAnimalShelter.location
+          ? await this.translationService.translateText(
+              updateAnimalShelter.location,
+              targetLang,
+            )
+          : existingTranslation?.location;
+
+        if (existingTranslation) {
+          Object.assign(existingTranslation, {
+            location: translatedLocation,
+          });
+        } else {
+          existingTranslation = this.animalShelterTranslationRepo.create({
+            location: translatedLocation || 'Translations unavailable',
+            language: targetLang,
+            animalShelter: animalShelter,
+          });
+
+          animalShelter.translations.push(existingTranslation);
+        }
+        // Save teh transaltions
+        await this.animalShelterTranslationRepo.save(existingTranslation);
+      }
+    }
+
+    const updatedAnimalShelter =
+      await this.animalShelterRepo.save(animalShelter);
+
+    return {
+      message: `The Animal shelter with ID: ${id} has been updated successfully.`,
+    };
   }
 
   async deleteAnimalShelter(id: number) {
-    await this.animalShelterRepo.delete(id);
+    const animalShelter = await this.animalShelterRepo.findOne({
+      where: { id: id },
+      relations: ['department', 'translations'],
+    });
+
+    if (!animalShelter)
+      throw new NotFoundException(`The shelter with ID:${id} does not exist.`);
+
+    // Remove associated translations
+    if (animalShelter.translations?.length > 0) {
+      for (const translation of animalShelter.translations) {
+        await this.animalShelterTranslationRepo.remove(translation);
+      }
+    }
+
+    // Remove associations with department
+    animalShelter.department = null;
+
+    await this.animalShelterRepo.save(animalShelter);
+
+    await this.animalShelterRepo.remove(animalShelter);
 
     return {
       message: `The shelter with ID: ${id} has been delete successfuly.`,

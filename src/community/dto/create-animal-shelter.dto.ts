@@ -12,4 +12,7 @@ export class CreateAnimalShelterDto {
 
   @IsString()
   departmentName: string;
+
+  @IsString()
+  language: string;
 }

@@ -32,6 +32,6 @@ export class AnimalTranslation {
   @Column()
   language: string;
 
-  @ManyToOne(() => Animal, (translation) => translation.translations)
+  @ManyToOne(() => Animal, (animal) => animal.translations)
   animal: Animal;
 }

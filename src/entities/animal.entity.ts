@@ -54,7 +54,7 @@ export class Animal {
   images: Image[];
 
   // Translation Table
-  @OneToMany(() => AnimalTranslation, (animalReport) => animalReport)
+  @OneToMany(() => AnimalTranslation, (animalReport) => animalReport.animal)
   @JoinColumn({ name: 'translationId' })
   translations: AnimalTranslation[];
 }

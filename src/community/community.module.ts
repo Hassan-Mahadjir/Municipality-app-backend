@@ -22,6 +22,7 @@ import { departmentTranslation } from 'src/entities/departmentTranslation.entity
 import { EmergencyContactTranslation } from 'src/entities/emergency-contactTranslations.entity';
 import { HistoricalPlaceTranslation } from 'src/entities/historical-pladceTranslation.entity';
 import { AnimalTranslation } from 'src/entities/animalTranslation.entity';
+import { AnimalShelterTranslation } from 'src/entities/shelterTranslations.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -39,6 +40,7 @@ import { AnimalTranslation } from 'src/entities/animalTranslation.entity';
       departmentTranslation,
       EmergencyContactTranslation,
       AnimalTranslation,
+      AnimalShelterTranslation,
     ]),
   ],
   controllers: [CommunityController],

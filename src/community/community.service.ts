@@ -414,6 +414,17 @@ export class CommunityService {
     return { message: `The schedules have been created successfully.` };
   }
 
+  async getAllWasteSechdule() {
+    const allSechdules = await this.wasteTypeRepo.find({
+      relations: ['sechdules', 'sechdules.translations', 'translations'],
+    });
+
+    return {
+      message: `Successfully fetched ${allSechdules.length} types with the sechdules`,
+      data: allSechdules,
+    };
+  }
+
   async updateWasteSechdule(
     id: number,
     updateWasteSechduleDto: UpdateWasteSechduleDto,

@@ -84,6 +84,11 @@ export class CommunityController {
     return this.communityService.updateWasteSechdule(+id, updateWasteSechdule);
   }
 
+  @Get('waste-sechdule')
+  getAllWasteSechdule() {
+    return this.communityService.getAllWasteSechdule();
+  }
+
   @Delete('waste-type/:id')
   deleteWaste(@Param('id') id: string) {
     return this.communityService.deleteWasteType(+id);

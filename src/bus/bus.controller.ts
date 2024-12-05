@@ -77,9 +77,9 @@ export class BusController {
     return this.busService.createSechdule(createSechduleDto);
   }
 
-  @Get('station')
-  getAllSechdule(){
-    return this.busService.getAllSechdule()
+  @Get('schedule')
+  getAllSechdule() {
+    return this.busService.getAllSechdule();
   }
 
   @Post('add-time')

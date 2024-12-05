@@ -17,6 +17,9 @@ export class Line {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @PrimaryGeneratedColumn()
+  line: number;
+
   @Column()
   from: string;
 

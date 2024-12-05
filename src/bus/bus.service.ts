@@ -303,9 +303,19 @@ export class BusService {
   }
 
   async getAllSechdule() {
-    return await this.dayRepo.find({
-      relations: ['timeTable', 'translations'],
+    const schedules = await this.dayRepo.find({
+      relations: [
+        'path',
+        'translations',
+        'path.sechdule.timeTable',
+        'path.sechdule.translations',
+      ],
     });
+
+    return {
+      message: 'Schdedule have been fetched successfully.',
+      data: schedules,
+    };
   }
   async createSechdule(createSechduleDto: CreateSechduleDto) {
     // Step 1: Check if all goTimes exist in the database

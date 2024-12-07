@@ -121,7 +121,11 @@ export class BusService {
       .where('line.id = :id', { id })
       .getOne();
 
-    return { message: `Line has been fetched successfully`, data: line };
+    const lineInfo = await this.lineRepo.findOne({
+      where: { line: id },
+      relations: ['toStations'],
+    });
+    return { message: `Line has been fetched successfully`, data: lineInfo };
   }
 
   async updateLine(id: number, updateBusDto: UpdateBusDto) {

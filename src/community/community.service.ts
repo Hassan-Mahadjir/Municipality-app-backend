@@ -38,6 +38,7 @@ import { AnimalTranslation } from 'src/entities/animalTranslation.entity';
 import { AnimalShelterTranslation } from 'src/entities/shelterTranslations.entity';
 import { WasteSechduleTranslation } from 'src/entities/wasteSechduleTranslation.entity';
 import { WasteTypeTranslation } from 'src/entities/waste-typeTranslation.entity';
+import { DisasterPointTranslation } from 'src/entities/disaster-pointTranslation.entity';
 
 @Injectable()
 export class CommunityService {
@@ -66,6 +67,8 @@ export class CommunityService {
     private wasteSechduleTranslationRepo: Repository<WasteSechduleTranslation>,
     @InjectRepository(WasteTypeTranslation)
     private wasteTypeTranslationRepo: Repository<WasteTypeTranslation>,
+    @InjectRepository(DisasterPointTranslation)
+    private disasterPointTranslationsRepo: Repository<DisasterPointTranslation>,
   ) {}
   async createEmergencyContact(
     createEmergencyContactDto: CreateEmergencyContactDto,
@@ -1019,38 +1022,145 @@ export class CommunityService {
     const newDisasterPoint = await this.disasterPointRepo.create({
       ...createDisasterPointDto,
       department: department,
+      language: createDisasterPointDto.language,
     });
 
-    return await this.disasterPointRepo.save(newDisasterPoint);
+    const savedDisasterPoint =
+      await this.disasterPointRepo.save(newDisasterPoint);
+
+    // Define target languages
+    const allLanguages = ['EN', 'TR'];
+    const sourceLang = createDisasterPointDto.language;
+    const targetLanguages = allLanguages.filter((lang) => lang !== sourceLang);
+
+    // Create translations for target languages
+    for (const targetLang of targetLanguages) {
+      const translatedLocation = createDisasterPointDto.location
+        ? await this.translationService.translateText(
+            createDisasterPointDto.location,
+            targetLang,
+          )
+        : null;
+
+      const translatedTranslation = this.disasterPointTranslationsRepo.create({
+        language: targetLang,
+        location: translatedLocation,
+        disasterPoint: savedDisasterPoint,
+      });
+      await this.disasterPointTranslationsRepo.save(translatedTranslation);
+    }
+
+    return {
+      message: `Disaster Point has been created successfully.`,
+      data: savedDisasterPoint,
+    };
   }
 
   async findAllDisasterPoints() {
-    return await this.disasterPointRepo.find();
+    const disasterPoints = await this.disasterPointRepo.find({
+      relations: ['translations'],
+    });
+    return {
+      message: `Successfully fetched ${disasterPoints.length} disaster points`,
+      data: disasterPoints,
+    };
   }
 
   async findDisasterPoint(id: number) {
-    const point = await this.disasterPointRepo.findOne({ where: { id: id } });
+    const point = await this.disasterPointRepo.findOne({
+      where: { id: id },
+      relations: ['translations'],
+    });
     if (!point)
       throw new NotFoundException(
         `The Disaster point with ID: ${id} does not exist.`,
       );
-    return point;
+    return {
+      message: `Disaster point has been fetched successfully.`,
+      data: point,
+    };
   }
 
   async updateDisasterPoint(
     id: number,
     updateDisasterPointDto: UpdateDisasterPointDto,
   ) {
-    const point = await this.disasterPointRepo.findOne({ where: { id: id } });
+    const point = await this.disasterPointRepo.findOne({
+      where: { id: id },
+      relations: ['translations'],
+    });
     if (!point)
       throw new NotFoundException(
         `The Disaster point with ID: ${id} does not exist.`,
       );
 
-    return await this.disasterPointRepo.update({ id }, updateDisasterPointDto);
+    Object.assign(point, updateDisasterPointDto);
+
+    if (updateDisasterPointDto.location) {
+      // Define target languages
+      const allLanguages = ['EN', 'TR'];
+      const sourceLang = updateDisasterPointDto.language || point.language;
+      const targetLanguages = allLanguages.filter(
+        (lang) => lang !== sourceLang,
+      );
+
+      for (const targetLang of targetLanguages) {
+        let existingTranslation = point.translations.find(
+          (translation) => translation.language === targetLang,
+        );
+
+        const translatedLocation = updateDisasterPointDto.location
+          ? await this.translationService.translateText(
+              updateDisasterPointDto.location,
+              targetLang,
+            )
+          : existingTranslation.location;
+
+        if (existingTranslation) {
+          Object.assign(existingTranslation, { location: translatedLocation });
+        } else {
+          existingTranslation = this.disasterPointTranslationsRepo.create({
+            location: translatedLocation,
+            language: targetLang,
+            disasterPoint: point,
+          });
+
+          point.translations.push(existingTranslation);
+        }
+
+        await this.disasterPointTranslationsRepo.save(existingTranslation);
+      }
+    }
+
+    const updatedDisasterPoint = await this.disasterPointRepo.save(point);
+    return { message: `The point with #ID: ${id} has been updated.` };
   }
 
   async removeDisasterPoint(id: number) {
-    return await this.disasterPointRepo.delete(id);
+    const point = await this.disasterPointRepo.findOne({
+      where: { id: id },
+      relations: ['translations', 'department'],
+    });
+
+    if (!point)
+      throw new NotFoundException(
+        `The Disaster point with ID: ${id} does not exist.`,
+      );
+
+    if (point.translations.length > 0) {
+      for (const transaltion of point.translations) {
+        await this.disasterPointTranslationsRepo.remove(transaltion);
+      }
+    }
+
+    point.department = null;
+
+    await this.disasterPointRepo.save(point);
+
+    await this.disasterPointRepo.remove(point);
+
+    return {
+      message: `The disaster point with #ID${id} has been successfully removed.`,
+    };
   }
 }

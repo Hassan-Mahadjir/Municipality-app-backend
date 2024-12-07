@@ -8,5 +8,8 @@ export class CreateDisasterPointDto {
   capacity: number;
 
   @IsString()
+  language: string;
+
+  @IsString()
   departmentName: string;
 }

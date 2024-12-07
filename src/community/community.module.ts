@@ -25,6 +25,7 @@ import { AnimalTranslation } from 'src/entities/animalTranslation.entity';
 import { AnimalShelterTranslation } from 'src/entities/shelterTranslations.entity';
 import { WasteSechduleTranslation } from 'src/entities/wasteSechduleTranslation.entity';
 import { WasteTypeTranslation } from 'src/entities/waste-typeTranslation.entity';
+import { DisasterPointTranslation } from 'src/entities/disaster-pointTranslation.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -45,6 +46,7 @@ import { WasteTypeTranslation } from 'src/entities/waste-typeTranslation.entity'
       AnimalShelterTranslation,
       WasteTypeTranslation,
       WasteSechduleTranslation,
+      DisasterPointTranslation,
     ]),
   ],
   controllers: [CommunityController],

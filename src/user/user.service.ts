@@ -100,4 +100,14 @@ export class UserService {
       { password: newHashedPassword },
     );
   }
+
+  async getUser(id: number) {
+    const user = await this.userRepo.findOne({
+      where: { id: id },
+      relations: ['profile', 'profile.translation'],
+    });
+    if (!user)
+      throw new NotFoundException(`The user with ID:${id} does not exist`);
+    return { message: `User has been fetched successfully.`, data: user };
+  }
 }

@@ -102,7 +102,7 @@ export class DepartmentService {
   async findDepartment(id: number) {
     const deparmtnet = await this.departmentRepo.findOne({
       where: { id: id },
-      relations: ['translations'],
+      relations: ['translations', 'responsible.profile'],
     });
 
     if (!deparmtnet)

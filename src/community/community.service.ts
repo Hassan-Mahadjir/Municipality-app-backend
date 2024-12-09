@@ -887,7 +887,7 @@ export class CommunityService {
 
   async findAllAnimalShelters() {
     const animalShelters = await this.animalShelterRepo.find({
-      relations: ['department', 'translations'],
+      relations: ['translations'],
     });
     return {
       message: `Successflly fetched ${animalShelters.length} animal shelters`,

@@ -88,4 +88,9 @@ export class UserController {
     const userId = req.user.id;
     return this.profileService.create(userId, createProfileDto);
   }
+
+  @Get(':id')
+  getUser(@Param('id', ParseIdPipe) id) {
+    return this.userService.getUser(id);
+  }
 }

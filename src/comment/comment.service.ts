@@ -80,7 +80,10 @@ export class CommentService {
           'historicalPlaceComments.user.profile',
         ],
       });
-      return historicalPlace;
+      return {
+        message: 'Comment has been fetched successfully.',
+        data: historicalPlace,
+      };
     }
   }
 

@@ -17,6 +17,7 @@ import { TranslationService } from 'src/translation/translation.service';
 import { departmentTranslation } from 'src/entities/departmentTranslation.entity';
 import { HistoricalPlaceTranslation } from 'src/entities/historical-pladceTranslation.entity';
 import { RestaurantTranslation } from 'src/entities/restaurantTranslations.entity';
+import { PaymentPoint } from 'src/entities/payment-point.entity';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { RestaurantTranslation } from 'src/entities/restaurantTranslations.entit
       departmentTranslation,
       HistoricalPlaceTranslation,
       RestaurantTranslation,
+      PaymentPoint
     ]),
   ],
   controllers: [TourismController],

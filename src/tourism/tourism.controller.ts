@@ -13,6 +13,8 @@ import { UpdateRestaurantDto } from './dto/update-restaurant.dto';
 import { ParseIdPipe } from 'src/user/pipes/paraseIdPipe';
 import { CreateHistoricalPlaceDto } from './dto/create-historical-place';
 import { UpdateHistoricalPlaceDto } from './dto/update-historical-place';
+import { CreatePaymentPointDto } from './dto/create-payment-point';
+import { UpdatePaymentPointDto } from './dto/update-payment-point';
 
 @Controller('tourism')
 export class TourismController {
@@ -74,4 +76,35 @@ export class TourismController {
   deleteHistoricalPlace(@Param('id', ParseIdPipe) id) {
     return this.tourismService.deleteHistoricalPlace(id);
   }
+
+
+  @Post('payment-point')
+  createPaymentPoint(
+    @Body() createPaymentPointDto: CreatePaymentPointDto,
+  ) {
+    return this.tourismService.createPaymentPoint(createPaymentPointDto);
+  }
+  @Get('payment-point/:id')
+  findAllPaymentPoint(@Param('id', ParseIdPipe) id) {
+    return this.tourismService.findPaymentPoint(id);
+  }
+
+  @Get('payment-point')
+  findPaymentPoint() {
+    return this.tourismService.findAllPaymentPoint();
+  }
+
+  @Patch('payment-point/:id')
+  updatePaymentPoint(
+    @Param('id', ParseIdPipe) id,
+    @Body() updatePaymentPoint: UpdatePaymentPointDto,
+  ) {
+    return this.tourismService.updatePaymentPoint(id, updatePaymentPoint);
+  }
+
+  @Delete('payment-point/:id')
+  deletePaymentPoint(@Param('id', ParseIdPipe) id) {
+    return this.tourismService.deletePaymentPoint(id);
+  }
+
 }

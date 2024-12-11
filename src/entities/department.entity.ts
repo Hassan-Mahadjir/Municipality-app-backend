@@ -24,6 +24,7 @@ import { Animal } from './animal.entity';
 import { AnimalShelter } from './shelter.entity';
 import { Event } from './event.entity';
 import { departmentTranslation } from './departmentTranslation.entity';
+import { PaymentPoint } from './payment-point.entity';
 
 @Entity({ name: 'DEPARTMENT' })
 export class Department {
@@ -127,4 +128,8 @@ export class Department {
   )
   @JoinColumn({ name: 'translationId' })
   translations: departmentTranslation[];
+
+  //Relationship with payment point
+  @OneToMany(() => PaymentPoint, (paymantPoint) => paymantPoint.department)
+  paymantPoint: PaymentPoint[];
 }

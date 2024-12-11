@@ -17,6 +17,9 @@ import { UpdateHistoricalPlaceDto } from './dto/update-historical-place';
 import { TranslationService } from 'src/translation/translation.service';
 import { HistoricalPlaceTranslation } from 'src/entities/historical-pladceTranslation.entity';
 import { RestaurantTranslation } from 'src/entities/restaurantTranslations.entity';
+import { CreatePaymentPointDto } from './dto/create-payment-point';
+import { PaymentPoint } from 'src/entities/payment-point.entity';
+import { UpdatePaymentPointDto } from './dto/update-payment-point';
 
 @Injectable()
 export class TourismService {
@@ -32,6 +35,8 @@ export class TourismService {
     private historicalPlaceTransaltionRepo: Repository<HistoricalPlaceTranslation>,
     @InjectRepository(RestaurantTranslation)
     private restaurantTranslationRepo: Repository<RestaurantTranslation>,
+    @InjectRepository(PaymentPoint)
+    private paymentPointRepo: Repository<PaymentPoint>
   ) {}
 
   async createRestaurant(createRestaruantDto: CreateRestaurantDto) {
@@ -481,4 +486,114 @@ export class TourismService {
       message: `Historical Place with ID:${id} and its images have been removed.`,
     };
   }
+
+
+  async createPaymentPoint(
+    createPaymentPointDto: CreatePaymentPointDto,
+  ) {
+    const department = await this.departmentService.findDepartmentbyName(
+      createPaymentPointDto.departmentName,
+    );
+
+    if (!department)
+      throw new NotFoundException(
+        `The department ${createPaymentPointDto.departmentName} does not exist.`,
+      );
+
+    if (createPaymentPointDto.departmentName.toLowerCase() !== 'tourism')
+      throw new UnauthorizedException(
+        `The service is not allowed to assign here.`,
+      );
+
+
+    // Create the new payment point
+    const newPaymentPoint = this.paymentPointRepo.create({
+      branch: createPaymentPointDto.branch,
+      phone: createPaymentPointDto.phone,
+      office: createPaymentPointDto.office , 
+      department:department
+    });
+
+    // Save the new point
+    const savePaymentPoint =
+      await this.paymentPointRepo.save(newPaymentPoint);
+
+
+    return {
+      message: 'Payment Point created successfully!.',
+      data: savePaymentPoint,
+    };
+  }
+  async findAllPaymentPoint() {
+    const paymentPoints = await this.paymentPointRepo.find();
+
+    return {
+      message: `Successfully fetched ${paymentPoints.length} points.`,
+      data: paymentPoints,
+    };
+  }
+  async findPaymentPoint(id: number) {
+    const paymentPoint = await this.paymentPointRepo.findOne({
+      where: { id: id },
+    });
+
+    return {
+      message: `Successfully fetched payment point.`,
+      data: paymentPoint,
+    };
+  }
+
+
+  async updatePaymentPoint(
+    id: number,
+    updatePaymentPoint: UpdatePaymentPointDto,
+  ) {
+    const paymentPoint = await this.paymentPointRepo.findOne({
+      where: { id: id },
+    });
+
+    if (!paymentPoint) {
+      throw new NotFoundException(
+        `The Payment Point with ID:${id} does not exist.`,
+      );
+    }
+
+    // Update the restaurant fields with the values from the DTO
+    Object.assign(paymentPoint, updatePaymentPoint);
+   
+
+    // Save the updated restaurant with the new images and transaltions
+    const updatedPaymentPoint =
+      await this.paymentPointRepo.save(paymentPoint);
+
+    return { message: 'Payment Point has been updated successfully.' };
+  }
+
+
+  async deletePaymentPoint(id: number) {
+    const paymentPoint = await this.paymentPointRepo.findOne({
+      where: { id: id },
+    });
+
+    if (!paymentPoint) {
+      throw new NotFoundException(
+        `The Payment Point with ID:${id} does not exist.`,
+      );
+    }
+
+    paymentPoint.department = null;
+
+    await this.paymentPointRepo.save(paymentPoint);
+
+    // Now delete the restaurant itself
+    await this.paymentPointRepo.remove(paymentPoint);
+
+    return {
+      message: `Payment Point with ID:${id} has been removed.`,
+    };
+  }
+
+
+
+
 }

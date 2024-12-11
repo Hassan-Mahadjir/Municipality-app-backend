@@ -20,7 +20,7 @@ export class DisasterPoint {
   @Column()
   capacity: number;
 
-  @Column({nullable:true})
+  @Column({ nullable: true })
   language: string;
 
   @ManyToOne(() => Department, (department) => department.disasterPoints)

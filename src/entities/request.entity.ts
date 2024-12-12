@@ -27,8 +27,11 @@ export class Request {
   @Column()
   status: string;
 
-  @Column({ nullable: true })
-  location: string;
+  @Column()
+  latitude: string;
+
+  @Column()
+  longitude: string;
 
   @Column()
   language: string;

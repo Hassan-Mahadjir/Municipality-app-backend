@@ -59,8 +59,9 @@ export class ReportService {
     // Create the original report
     const newReport = this.reportRepo.create({
       subject: createReportDto.subject,
-      location: createReportDto.location,
       message: createReportDto.message,
+      latitude: createReportDto.latitude,
+      longitude: createReportDto.longitude,
       images: images,
       language: createReportDto.language,
       department: department,

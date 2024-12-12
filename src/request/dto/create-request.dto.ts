@@ -5,7 +5,10 @@ export class CreateRequestDto {
   subject: string;
 
   @IsString()
-  location: string;
+  longitude: string;
+
+  @IsString()
+  latitude: string;
 
   @IsString()
   message: string;

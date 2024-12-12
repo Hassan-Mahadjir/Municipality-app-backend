@@ -59,9 +59,10 @@ export class RequestService {
     // Create the original request
     const newRequest = this.requestRepo.create({
       subject: createRequestDto.subject,
-      location: createRequestDto.location,
       message: createRequestDto.message,
       images: images,
+      latitude: createRequestDto.latitude,
+      longitude: createRequestDto.longitude,
       language: createRequestDto.language,
       department: department,
       status: translatedStatus || 'On hold',

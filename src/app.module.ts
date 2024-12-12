@@ -24,6 +24,7 @@ import { CommunityModule } from './community/community.module';
 import { CommentModule } from './comment/comment.module';
 import { EventModule } from './event/event.module';
 import { TranslationModule } from './translation/translation.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { TranslationModule } from './translation/translation.module';
     CommentModule,
     EventModule,
     TranslationModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [

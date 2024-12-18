@@ -13,6 +13,12 @@ export class CreateAnimalDto {
   @IsString()
   contactInfo: string;
 
+  @IsString()
+  latitude: string;
+
+  @IsString()
+  longitude: string;
+
   @IsArray()
   imageUrls: string[];
 

@@ -14,10 +14,10 @@ export class ProfileTranslation {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
   description: string;
 
-  @Column()
+  @Column({ nullable: true })
   gender: string;
 
   @Column()

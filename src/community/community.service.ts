@@ -583,6 +583,8 @@ export class CommunityService {
       status: translatedStatus || 'Lost',
       description: createAnimalDto.description,
       contactInfo: createAnimalDto.contactInfo,
+      longitude: createAnimalDto.longitude,
+      latitude: createAnimalDto.latitude,
       location: createAnimalDto.location,
       department: department,
       language: createAnimalDto.language,

@@ -131,6 +131,7 @@ export class AuthService {
     return {
       message:
         'If the this user exists, they will receive an email to reset the password.',
+      data: `Check your email.`,
     };
   }
 

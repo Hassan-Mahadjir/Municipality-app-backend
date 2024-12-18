@@ -26,7 +26,7 @@ export class Profile {
   @Column({ nullable: true })
   avatar: string;
 
-  @Column()
+  @Column({ nullable: true })
   gender: string;
 
   @Column({ nullable: true })

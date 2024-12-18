@@ -30,6 +30,12 @@ export class Animal {
   contactInfo: string;
 
   @Column()
+  latitude: string;
+
+  @Column()
+  longitude: string;
+
+  @Column()
   location: string;
 
   @CreateDateColumn()

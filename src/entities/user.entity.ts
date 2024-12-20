@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -17,6 +18,7 @@ import { Appointment } from './appointment.entity';
 import { Report } from './report.entity';
 import { Animal } from './animal.entity';
 import { Comment } from './comment.entity';
+import { Notification } from './notification.entity';
 
 @Entity({ name: 'USER' })
 export class User {
@@ -78,4 +80,9 @@ export class User {
   // Relationship with COMMENT
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
+
+  // Relationsship with NOTIFICATION
+  @OneToMany(() => Notification, (notification) => notification.user)
+  @JoinColumn({ name: 'notificationId' })
+  notifications: Notification[];
 }

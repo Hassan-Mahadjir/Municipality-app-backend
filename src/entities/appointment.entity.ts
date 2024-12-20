@@ -10,6 +10,7 @@ import {
 import { User } from './user.entity';
 import { Availability } from './availability.entity';
 import { AppointmentTranslation } from './appointmentTranslation.entity';
+import { Notification } from './notification.entity';
 
 @Entity('APPOINTMENT')
 export class Appointment {
@@ -45,4 +46,9 @@ export class Appointment {
   )
   @JoinColumn({ name: 'translationId' })
   translations: AppointmentTranslation[];
+
+  // Relationship with NOTIFICATION
+  @OneToMany(() => Notification, (notification) => notification.appointment)
+  @JoinColumn({ name: 'notificationId' })
+  notifications: Notification[];
 }

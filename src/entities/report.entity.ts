@@ -11,6 +11,7 @@ import { User } from './user.entity';
 import { Department } from './department.entity';
 import { ReportTranslation } from './reportTranslation.entity';
 import { Image } from './image.entity';
+import { Notification } from './notification.entity';
 
 @Entity({ name: 'REPORT' })
 export class Report {
@@ -57,4 +58,9 @@ export class Report {
   @OneToMany(() => ReportTranslation, (translation) => translation.report)
   @JoinColumn({ name: 'translationId' })
   translations: ReportTranslation[];
+
+  // relationship with NOTIFICATION
+  @OneToMany(() => Notification, (notification) => notification.report)
+  @JoinColumn({ name: 'notificationId' })
+  notifications: Notification[];
 }

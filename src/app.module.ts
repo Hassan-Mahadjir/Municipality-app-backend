@@ -25,6 +25,7 @@ import { CommentModule } from './comment/comment.module';
 import { EventModule } from './event/event.module';
 import { TranslationModule } from './translation/translation.module';
 import { CategoryModule } from './category/category.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { CategoryModule } from './category/category.module';
     EventModule,
     TranslationModule,
     CategoryModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [

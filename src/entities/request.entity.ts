@@ -12,6 +12,7 @@ import { User } from './user.entity';
 import { Department } from './department.entity';
 import { Image } from './image.entity';
 import { RequestTranslation } from './requestTranslation.entity';
+import { Notification } from './notification.entity';
 
 @Entity({ name: 'REQUEST' })
 export class Request {
@@ -58,4 +59,9 @@ export class Request {
   @OneToMany(() => RequestTranslation, (translation) => translation.request)
   @JoinColumn({ name: 'translationId' })
   translations: RequestTranslation[];
+
+  // Relationship with NOTIFICATION
+  @OneToMany(() => Notification, (notification) => notification)
+  @JoinColumn({ name: 'notificationId' })
+  notifications: Notification[];
 }

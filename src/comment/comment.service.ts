@@ -71,7 +71,10 @@ export class CommentService {
         where: { id: id },
         relations: ['restaurantComments', 'restaurantComments.user.profile'],
       });
-      return restaruant;
+      return {
+        message: 'Comment has been fetched successfully.',
+        data: restaruant,
+      };
     } else if (type === 'historicalPlace') {
       const historicalPlace = await this.historicalPlaceRepo.findOne({
         where: { id: id },

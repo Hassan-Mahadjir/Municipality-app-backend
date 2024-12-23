@@ -36,7 +36,7 @@ export class TourismService {
     @InjectRepository(RestaurantTranslation)
     private restaurantTranslationRepo: Repository<RestaurantTranslation>,
     @InjectRepository(PaymentPoint)
-    private paymentPointRepo: Repository<PaymentPoint>
+    private paymentPointRepo: Repository<PaymentPoint>,
   ) {}
 
   async createRestaurant(createRestaruantDto: CreateRestaurantDto) {
@@ -487,10 +487,7 @@ export class TourismService {
     };
   }
 
-
-  async createPaymentPoint(
-    createPaymentPointDto: CreatePaymentPointDto,
-  ) {
+  async createPaymentPoint(createPaymentPointDto: CreatePaymentPointDto) {
     const department = await this.departmentService.findDepartmentbyName(
       createPaymentPointDto.departmentName,
     );
@@ -505,19 +502,18 @@ export class TourismService {
         `The service is not allowed to assign here.`,
       );
 
-
     // Create the new payment point
     const newPaymentPoint = this.paymentPointRepo.create({
       branch: createPaymentPointDto.branch,
       phone: createPaymentPointDto.phone,
-      office: createPaymentPointDto.office , 
-      department:department
+      office: createPaymentPointDto.office,
+      latitude: createPaymentPointDto.latitude,
+      longitude: createPaymentPointDto.longitude,
+      department: department,
     });
 
     // Save the new point
-    const savePaymentPoint =
-      await this.paymentPointRepo.save(newPaymentPoint);
-
+    const savePaymentPoint = await this.paymentPointRepo.save(newPaymentPoint);
 
     return {
       message: 'Payment Point created successfully!.',
@@ -543,7 +539,6 @@ export class TourismService {
     };
   }
 
-
   async updatePaymentPoint(
     id: number,
     updatePaymentPoint: UpdatePaymentPointDto,
@@ -560,15 +555,12 @@ export class TourismService {
 
     // Update the restaurant fields with the values from the DTO
     Object.assign(paymentPoint, updatePaymentPoint);
-   
 
     // Save the updated restaurant with the new images and transaltions
-    const updatedPaymentPoint =
-      await this.paymentPointRepo.save(paymentPoint);
+    const updatedPaymentPoint = await this.paymentPointRepo.save(paymentPoint);
 
     return { message: 'Payment Point has been updated successfully.' };
   }
-
 
   async deletePaymentPoint(id: number) {
     const paymentPoint = await this.paymentPointRepo.findOne({
@@ -592,8 +584,4 @@ export class TourismService {
       message: `Payment Point with ID:${id} has been removed.`,
     };
   }
-
-
-
-
 }

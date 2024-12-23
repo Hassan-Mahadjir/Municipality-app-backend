@@ -20,6 +20,12 @@ export class Pharmacy {
   @Column()
   location: string;
 
+  @Column({ nullable: true, type: 'float' })
+  latitude: number;
+
+  @Column({ nullable: true, type: 'float' })
+  longitude: number;
+
   @Column({ nullable: true })
   imageUrl: string;
 

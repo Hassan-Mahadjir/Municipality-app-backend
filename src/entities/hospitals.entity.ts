@@ -7,7 +7,6 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from './user.entity';
 import { Department } from './department.entity';
 import { HospitalTranslated } from './hospitalsTranslated.entity';
 
@@ -21,6 +20,12 @@ export class Hospital {
 
   @Column()
   location: string;
+
+  @Column({ nullable: true, type: 'float' })
+  latitude: number;
+
+  @Column({ nullable: true, type: 'float' })
+  longitude: number;
 
   @Column({ nullable: true })
   imageUrl: string;

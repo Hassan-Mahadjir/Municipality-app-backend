@@ -1,4 +1,4 @@
-import { IsArray, IsString } from 'class-validator';
+import { IsArray, IsString ,IsNumber} from 'class-validator';
 
 export class CreateEventDto {
   @IsString()
@@ -9,6 +9,12 @@ export class CreateEventDto {
 
   @IsString()
   location: string;
+
+  @IsNumber()
+  longitude: number;
+  
+  @IsNumber()
+  latitude: number;
 
   @IsString()
   header: string;

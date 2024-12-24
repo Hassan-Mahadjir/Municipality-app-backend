@@ -1,6 +1,7 @@
 import {
   IsArray,
   IsBoolean,
+  IsNumber,
   IsPhoneNumber,
   IsString,
   IsUrl,
@@ -18,6 +19,11 @@ export class CreateRestaurantDto {
 
   @IsString()
   location: string;
+  @IsNumber()
+  longitude: number;
+    
+  @IsNumber()
+  latitude: number;
 
   @IsString()
   openingHrWeekday: string;

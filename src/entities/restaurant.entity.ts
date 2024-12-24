@@ -24,6 +24,12 @@ export class Restaurant {
 
   @Column()
   location: string;
+  @Column({nullable:true,type:'float'})
+  longitude: number;
+
+  @Column({nullable:true,type:'float'})
+  latitude: number;
+
 
   @Column()
   phone: string;

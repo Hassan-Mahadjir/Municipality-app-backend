@@ -20,6 +20,9 @@ export class Pharmacy {
   @Column()
   location: string;
 
+  @Column({ nullable: true})
+  phone:string;
+
   @Column({ nullable: true, type: 'float' })
   latitude: number;
 

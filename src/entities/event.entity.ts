@@ -26,6 +26,11 @@ export class Event {
 
   @Column()
   location: string;
+  
+  @Column({nullable:true,type:'float'})
+  longitude: number
+  @Column({nullable:true,type:'float'})
+  latitude: number
 
   @Column()
   category: string;

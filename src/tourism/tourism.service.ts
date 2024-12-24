@@ -67,6 +67,8 @@ export class TourismService {
     const newRestaurant = this.restaurantRepo.create({
       name: createRestaruantDto.name,
       location: createRestaruantDto.location,
+      longitude:createRestaruantDto.longitude,
+      latitude: createRestaruantDto.latitude,
       phone: createRestaruantDto.phone,
       open: createRestaruantDto.open,
       openingHrWeekday: createRestaruantDto.openingHrWeekday,
@@ -281,6 +283,8 @@ export class TourismService {
     const newHistoricalPlace = this.historicalPlaceRepo.create({
       name: createHistoricalPlaceDto.name,
       location: createHistoricalPlaceDto.location,
+      longitude:createHistoricalPlaceDto.longitude,
+      latitude:createHistoricalPlaceDto.latitude,
       history: createHistoricalPlaceDto.history,
       open: createHistoricalPlaceDto.open,
       openingHrWeekday: createHistoricalPlaceDto.openingHrWeekday,

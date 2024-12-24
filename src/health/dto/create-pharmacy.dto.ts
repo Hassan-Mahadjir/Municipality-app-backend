@@ -5,6 +5,9 @@ export class CreatePharmacyDto {
   name: string;
   @IsString()
   location: string;
+  
+  @IsString()
+  phone:string;
 
   @IsNumber()
   latitude: number;

@@ -6,6 +6,9 @@ export class CreateHospitalDto {
   @IsString()
   location: string;
 
+  @IsString()
+  phone:string;
+
   @IsNumber()
   latitude: number;
 

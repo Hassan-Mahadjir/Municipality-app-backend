@@ -45,6 +45,8 @@ export class EventService {
       header: createEventDto.header,
       department: department,
       location: createEventDto.location,
+      longitude:createEventDto.longitude,
+      latitude: createEventDto.latitude,
       category: createEventDto.category,
       language: createEventDto.language
     });

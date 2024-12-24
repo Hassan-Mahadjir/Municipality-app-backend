@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsNumber, IsString } from 'class-validator';
 
 export class CreateHistoricalPlaceDto {
   @IsString()
@@ -12,6 +12,12 @@ export class CreateHistoricalPlaceDto {
 
   @IsString()
   location: string;
+  @IsNumber()
+  longitude: number;
+    
+  @IsNumber()
+  latitude: number;
+
 
   @IsString()
   openingHrWeekday: string;

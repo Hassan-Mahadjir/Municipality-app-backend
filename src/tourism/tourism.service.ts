@@ -125,7 +125,7 @@ export class TourismService {
   async findOneRestaurant(id: number) {
     const restaurant = await this.restaurantRepo.findOne({
       where: { id: id },
-      relations: ['images', 'translations'],
+      relations: ['images', 'translations',"restaurantComments"],
     });
 
     if (!restaurant)

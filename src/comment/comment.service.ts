@@ -71,7 +71,7 @@ export class CommentService {
         where: { id: id },
         relations: ['restaurantComments', 'restaurantComments.user.profile'],
       });
-       return {
+      return {
         message: 'Comment has been fetched successfully.',
         data: restaruant,
       };

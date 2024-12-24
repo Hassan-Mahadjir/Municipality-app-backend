@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsNumber, IsString } from 'class-validator';
 
 export class CreatePaymentPointDto {
   @IsString()
@@ -12,4 +12,9 @@ export class CreatePaymentPointDto {
   @IsString()
   departmentName: string;
 
+  @IsNumber()
+  latitude: number;
+
+  @IsNumber()
+  longitude: number;
 }

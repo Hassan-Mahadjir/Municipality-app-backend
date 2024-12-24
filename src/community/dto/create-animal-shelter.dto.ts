@@ -1,4 +1,4 @@
-import { IsString, IsUrl } from 'class-validator';
+import { IsString, IsUrl,IsNumber } from 'class-validator';
 
 export class CreateAnimalShelterDto {
   @IsString()
@@ -6,6 +6,12 @@ export class CreateAnimalShelterDto {
 
   @IsString()
   location: string;
+  
+  @IsNumber()
+  longitude: number;
+  
+  @IsNumber()
+  latitude: number;
 
   @IsUrl()
   logo: string;

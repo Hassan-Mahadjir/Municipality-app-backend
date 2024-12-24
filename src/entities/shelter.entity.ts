@@ -20,6 +20,12 @@ export class AnimalShelter {
   @Column()
   location: string;
 
+  @Column({nullable:true,type:'float'})
+  longitude: number
+  
+  @Column({nullable:true,type:'float'})
+  latitude: number
+
   @Column()
   logo: string;
 

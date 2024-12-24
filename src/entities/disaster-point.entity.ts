@@ -13,9 +13,15 @@ import { DisasterPointTranslation } from './disaster-pointTranslation.entity';
 export class DisasterPoint {
   @PrimaryGeneratedColumn()
   id: number;
+  @Column({ nullable: true })
+  name: string;
 
   @Column()
   location: string;
+  @Column({nullable:true,type:'float'})
+  longitude: number
+  @Column({nullable:true,type:'float'})
+  latitude: number
 
   @Column()
   capacity: number;

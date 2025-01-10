@@ -64,6 +64,15 @@ export class UserController {
     return this.userService.update(id, updateUserDto);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Patch('manage/:id')
+  updaterole(
+    @Param('id', ParseIdPipe) id,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.userService.update(id, updateUserDto);
+  }
+
   @Roles(Role.ADMIN)
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
@@ -83,10 +92,32 @@ export class UserController {
     return this.profileService.update(userId, updateProfileDto);
   }
 
+  @Patch('manage-profile/:id')
+  async updateProfileAdmin(
+    @Body() updateProfileDto: UpdateProfileDto,
+    @Param('id', ParseIdPipe) id,
+  ) {
+    if (isNaN(id)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+
+    return this.profileService.update(id, updateProfileDto);
+  }
+
   @Post('profile')
   createProfile(@Req() req, @Body() createProfileDto: CreateProfileDto) {
     const userId = req.user.id;
     return this.profileService.create(userId, createProfileDto);
+  }
+
+  @Get('/staff')
+  getResposibles() {
+    return this.userService.getResposibles();
+  }
+
+  @Get('/users')
+  getUsers() {
+    return this.userService.getUsers();
   }
 
   @Get(':id')

@@ -821,6 +821,8 @@ export class CommunityService {
       for (const translation of animalReport.translations) {
         await this.animalTranslationRepo.remove(translation);
       }
+
+      
     }
 
     // Remove the association with department and user by setting them to null

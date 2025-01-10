@@ -14,6 +14,7 @@ import { CreateProfileDto } from 'src/profile/dto/create-profile.dto';
 import { ProfileService } from 'src/profile/profile.service';
 import { ChangePasswordDto } from 'src/auth/dto/change-password.dto';
 import passport from 'passport';
+import { Role } from 'src/auth/enums/role.enums';
 
 @Injectable()
 export class UserService {
@@ -109,5 +110,28 @@ export class UserService {
     if (!user)
       throw new NotFoundException(`The user with ID:${id} does not exist`);
     return { message: `User has been fetched successfully.`, data: user };
+  }
+
+  async getResposibles() {
+    const resposibles = await this.userRepo.find({
+      where: { role: Role.STAFF },
+      relations: ['profile', 'profile.translation'],
+    });
+
+    return {
+      message: 'Resposible have been fetched successfully.',
+      data: resposibles,
+    };
+  }
+
+  async getUsers() {
+    const resposibles = await this.userRepo.find({
+      relations: ['profile', 'profile.translation'],
+    });
+
+    return {
+      message: 'Users have been fetched successfully.',
+      data: resposibles,
+    };
   }
 }

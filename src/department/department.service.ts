@@ -94,7 +94,7 @@ export class DepartmentService {
     const allServices = await this.departmentRepo.find({
       skip: paginationDTO.skip,
       take: paginationDTO.limit ?? DEFAULT_PAGE_SIZE,
-      relations: ['translations'],
+      relations: ['translations', 'responsible.profile'],
     });
     return { message: 'Status is 200', data: allServices };
   }

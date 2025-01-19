@@ -2,9 +2,6 @@ import { IsArray, IsString } from 'class-validator';
 
 export class CreateAnnoucementDto {
   @IsString()
-  type: string;
-
-  @IsString()
   title: string;
 
   @IsString()
